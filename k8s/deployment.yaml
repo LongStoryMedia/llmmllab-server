@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llmmll-server
+  namespace: llmmll
+  labels:
+    app: llmmll-server
+spec:
+  selector:
+    matchLabels:
+      app: llmmll-server
+  template:
+    metadata:
+      labels:
+        app: llmmll-server
+    spec:
+      containers:
+        - name: server
+          image: 192.168.0.71:31500/server:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8001
+              protocol: TCP
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+          env:
+            - name: PYTHONPATH
+              value: "/app"
+            - name: SERVER_DIR
+              value: "/app/server"
+
+            # HTTP server configuration
+            - name: PORT
+              value: "8001"
+
+            # Database configuration
+            - name: DB_HOST
+              value: "192.168.0.71"
+            - name: DB_PORT
+              value: "32345"
+            - name: DB_USER
+              value: "lsm"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: DB_NAME
+              value: "llmmll"
+            - name: DB_SSLMODE
+              value: "disable"
+
+            # Redis configuration
+            - name: REDIS_ENABLED
+              value: "true"
+            - name: REDIS_HOST
+              value: "192.168.0.71"
+            - name: REDIS_PORT
+              value: "32346"
+            - name: REDIS_DB
+              value: "0"
+            - name: REDIS_CONVERSATION_TTL
+              value: "360"
+            - name: REDIS_MESSAGE_TTL
+              value: "180"
+            - name: REDIS_SUMMARY_TTL
+              value: "720"
+            - name: REDIS_POOL_SIZE
+              value: "10"
+            - name: REDIS_MIN_IDLE_CONNECTIONS
+              value: "2"
+            - name: REDIS_CONNECT_TIMEOUT
+              value: "5"
+
+            # Authentication configuration
+            - name: AUTH_ISSUER
+              value: "https://auth.longstorymedia.com"
+            - name: AUTH_AUDIENCE
+              value: "lsm-client"
+            - name: AUTH_CLIENT_ID
+              value: "lsm-client"
+            - name: AUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-client
+                  key: client_secret
+            - name: AUTH_JWKS_URI
+              value: "https://auth.longstorymedia.com/keys"
+
+            # Summarization configuration
+            - name: MESSAGES_BEFORE_SUMMARY
+              value: "6"
+            - name: SUMMARIES_BEFORE_CONSOLIDATION
+              value: "3"
+            - name: SUMMARY_MODEL
+              value: "qwen3:0.6b"
+            - name: SUMMARY_SYSTEM_PROMPT
+              value: "compress the following conversation so far into a concise paragraph. Include key points and conclusions, but omit redundant details. The summary will be used as context for future interaction. It should be as small as possible and does not need to be human readable."
+            - name: MAX_SUMMARY_LEVELS
+              value: "3"
+            - name: SUMMARY_WEIGHT_COEFFICIENT
+              value: "192.168.0.71"
+
+            # Internal security configuration
+            - name: INTERNAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: internal-api-key
+                  key: api_key
+            - name: INTERNAL_ALLOWED_IPS
+              value: "192.168.0.0/24,10.43.0.0/16"
+
+            # Logging configuration
+            - name: LOG_LEVEL
+              value: "debug"
+            - name: FORCE_COLOR
+              value: "1"
+
+            # Runner service connection
+            - name: RUNNER_HOST
+              value: "llmmll-runner.llmmll.svc.cluster.local"
+            - name: RUNNER_PORT
+              value: "50052"
+
+  strategy:
+    type: Recreate
+  replicas: 1

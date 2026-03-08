@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: llmmll-server
+  namespace: llmmll
+  labels:
+    app: llmmll-server
+spec:
+  type: LoadBalancer
+  selector:
+    app: llmmll-server
+  ports:
+    - name: http
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+  publishNotReadyAddresses: true
