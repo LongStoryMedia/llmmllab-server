@@ -4,14 +4,16 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .dynamic_tool import DynamicTool
+from models.dynamic_tool import DynamicTool
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
-
 
 
 class ToolNeeds(BaseModel):
     """Schema for tool needs analysis"""
-    available_tools: Annotated[List[str], Field(..., description="List of available tool names")]
+
+    available_tools: Annotated[
+        List[str], Field(..., description="List of available tool names")
+    ]
     """List of available tool names"""
     needs_dynamic_tool: Annotated[bool, Field(...)]
     dynamic_tool: Annotated[Optional[DynamicTool], Field(default=None)] = None

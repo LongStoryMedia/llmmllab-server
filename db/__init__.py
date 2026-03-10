@@ -8,30 +8,30 @@ from typing import Optional, Protocol, Any, Callable, cast
 
 from asyncpg import Pool
 
-from server.utils.logging import llmmllogger
-from .cache_storage import cache_storage
-from .userconfig_storage import UserConfigStorage
-from .connection_recovery import init_recovery_manager
-from .conversation_storage import ConversationStorage
-from .message_storage import MessageStorage
-from .image_storage import ImageStorage
-from .model_profile_storage import ModelProfileStorage
-from .model_storage import ModelStorage
-from .summary_storage import SummaryStorage
-from .memory_storage import MemoryStorage
-from .search_storage import SearchStorage
-from .dynamic_tool_storage import DynamicToolStorage
-from .thought_storage import ThoughtStorage
-from .analysis_storage import AnalysisStorage
-from .tool_call_storage import ToolCallStorage
-from .message_content_storage import MessageContentStorage
-from .document_storage import DocumentStorage
-from .todo_storage import TodoStorage
-from .checkpoint_storage import CheckpointStorage
-from .api_key_storage import ApiKeyStorage
-from .queries import get_query
-from .init_db import initialize_database
-from .maintenance import maintenance_service
+from utils.logging import llmmllogger
+from db.cache_storage import cache_storage
+from db.userconfig_storage import UserConfigStorage
+from db.connection_recovery import init_recovery_manager
+from db.conversation_storage import ConversationStorage
+from db.message_storage import MessageStorage
+from db.image_storage import ImageStorage
+from db.model_profile_storage import ModelProfileStorage
+from db.model_storage import ModelStorage
+from db.summary_storage import SummaryStorage
+from db.memory_storage import MemoryStorage
+from db.search_storage import SearchStorage
+from db.dynamic_tool_storage import DynamicToolStorage
+from db.thought_storage import ThoughtStorage
+from db.analysis_storage import AnalysisStorage
+from db.tool_call_storage import ToolCallStorage
+from db.message_content_storage import MessageContentStorage
+from db.document_storage import DocumentStorage
+from db.todo_storage import TodoStorage
+from db.checkpoint_storage import CheckpointStorage
+from db.api_key_storage import ApiKeyStorage
+from db.queries import get_query
+from db.init_db import initialize_database
+from db.maintenance import maintenance_service
 
 logger = llmmllogger.bind(component="db_init")
 
@@ -187,14 +187,14 @@ class Storage:
                 await c.execute("DISCARD ALL;")
                 await c.reload_schema_state()
 
-            logger.info("✅ Stale connection state cleared successfully")
+            logger.info("Stale connection state cleared successfully")
 
         except Exception as e:
             logger.warning(
                 f"Failed to clear stale connection state (non-critical): {e}"
             )
 
-    def get_service[T](self, service: Optional[T]) -> T:
+    def get_service(self, service: Optional[Any]) -> Any:
         """Get a storage service by name"""
         if not self.initialized:
             raise ValueError("Storage not initialized")
@@ -202,7 +202,7 @@ class Storage:
         if not service:
             raise ValueError(f"Unknown storage service: {service}")
 
-        return cast(T, service)
+        return service
 
 
 # Create a singleton instance

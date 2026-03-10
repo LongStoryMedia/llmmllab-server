@@ -7,7 +7,7 @@ from datetime import datetime as dt
 
 from fastapi import HTTPException, Request
 from fastapi.responses import StreamingResponse
-from server.models import (
+from models import (
     Conversation,
     Message,
     MessageContent,
@@ -15,13 +15,12 @@ from server.models import (
     MessageRole,
 )
 from pydantic import BaseModel
-from server.middleware.auth import get_request_id, get_user_id, is_admin
-from server.config import logger  # Import logger from config
-from runner import local_pipeline_cache
-from composer import clear_workflow_cache
-from composer.api.interface import ServerAdapter
-from server.db import storage  # Import database storage
-from server.routers.chat import router, composer_chat_completion
+from middleware.auth import get_request_id, get_user_id, is_admin
+from config import logger  # Import logger from config
+
+from db import storage  # Import database storage
+from routers.chat import router, composer_chat_completion
+from grpc_client import get_composer_client
 
 
 @router.get("/conversations", response_model=list[Conversation])
@@ -180,21 +179,19 @@ async def delete_conversation(conversation_id: int, request: Request):
 @router.get("/cancel")
 async def cancel_conversation(request: Request):
     """
-    Cancel the current conversation by clearing workflow cache and local pipeline cache.
+    Cancel the current conversation by clearing workflow cache.
     """
-    logger.info(f"Received cancel request")
+    logger.info("Received cancel request")
     user_id = get_user_id(request)
     logger.info(f"Received cancel request for user {user_id}")
     if not user_id:
         raise HTTPException(status_code=401, detail="Authentication required")
 
     try:
-        user_config = await storage.get_service(storage.user_config).get_user_config(
-            user_id
-        )
-        logger.info(f"Cancelling conversation for user {user_id}")
-        await clear_workflow_cache(user_id, server=ServerAdapter())
-        local_pipeline_cache.cleanup_for_user(user_config)
+        # Get composer client and clear workflow cache
+        client = get_composer_client()
+        await client.clear_workflow_cache(user_id=user_id)
+        logger.info(f"Cleared workflow cache for user {user_id}")
     except HTTPException as e:
         raise e
     except Exception as e:  # noqa: BLE001, justified for DB errors
@@ -272,7 +269,7 @@ async def replay_from_timestamp(
 
     Args:
         conversation_id: The conversation ID
-        from_timestamp: ISO 8601 timestamp string - delete messages created >= this time
+        from _timestamp: ISO 8601 timestamp string - delete messages created >= this time
     """
     user_id = get_user_id(request)
     if not user_id:

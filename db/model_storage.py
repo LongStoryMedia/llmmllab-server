@@ -4,11 +4,11 @@ Storage module for Model operations.
 
 import asyncpg
 from typing import List, Optional, Dict, Any, Callable
-from ..models.model import Model
-from ..models.model_details import ModelDetails
-from ..models.model_task import ModelTask
-from ..models.model_provider import ModelProvider
-from .db_utils import typed_pool, get_recovery_manager
+from models.model import Model
+from models.model_details import ModelDetails
+from models.model_task import ModelTask
+from models.model_provider import ModelProvider
+from db.db_utils import typed_pool, get_recovery_manager
 
 
 class ModelStorage:
@@ -23,9 +23,7 @@ class ModelStorage:
         query = self.get_query("list_models")
 
         async with self.typed_pool.acquire() as conn:
-            rows = await self._recovery_manager.execute_with_recovery(
-                conn.fetch, query
-            )
+            rows = await self._recovery_manager.execute_with_recovery(conn.fetch, query)
             return [self._row_to_model(row) for row in rows]
 
     async def get_model(self, model_id: str) -> Optional[Model]:

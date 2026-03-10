@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.conversation_item import ConversationItem
-from server.models.openai.conversation_item_list import ConversationItemList
-from server.models.openai.conversation_resource import ConversationResource
-from server.models.openai.create_conversation_body import CreateConversationBody
-from server.models.openai.deleted_conversation_resource import DeletedConversationResource
-from server.models.openai.update_conversation_body import UpdateConversationBody
+from models.openai.conversation_item import ConversationItem
+from models.openai.conversation_item_list import ConversationItemList
+from models.openai.conversation_resource import ConversationResource
+from models.openai.create_conversation_body import CreateConversationBody
+from models.openai.deleted_conversation_resource import DeletedConversationResource
+from models.openai.update_conversation_body import UpdateConversationBody
 
 
 router = APIRouter(prefix="/conversations", tags=["Conversations"])

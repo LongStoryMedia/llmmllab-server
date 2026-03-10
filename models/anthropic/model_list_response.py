@@ -6,7 +6,7 @@ from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
-from .model import Model
+from models.anthropic.model import Model
 
 
 class ModelListResponse(BaseModel):

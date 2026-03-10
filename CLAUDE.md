@@ -26,9 +26,8 @@ make lint
 # Build and deploy to k8s
 make deploy
 
-# Build Docker image
-./build-image.sh multi-arch
-./build-image.sh lsnode-3
+# Build Docker image only
+make build-image
 ```
 
 ### Validation & Linting

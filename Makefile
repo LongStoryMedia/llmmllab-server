@@ -1,12 +1,12 @@
 # Server Makefile
 # Manages build, test, and deployment of the server service
 
-.PHONY: all build test lint start deploy proto clean help
+.PHONY: all build test lint start deploy build-image proto postgres postgres-stop clean help
 
 all: build test
 
 # =============================================================================
-# Build
+# Build (Python)
 # =============================================================================
 
 build:
@@ -44,7 +44,7 @@ test-cover:
 
 lint:
 	@echo "Running server linting..."
-	@. .venv/bin/activate && pylint server/ --disable=C,R,W0622,W0611,W0613,W0718,W0511 --max-line-length=120 --jobs=4
+	@. .venv/bin/activate && PYTHONPATH="gen/python:." pylint --rcfile=.pylintrc server/ --disable=C,R,W0622,W0611,W0613,W0718,W0511 --max-line-length=120 --jobs=4
 	@echo "Server linting complete"
 
 lint-fix:
@@ -58,11 +58,11 @@ lint-fix:
 
 start:
 	@echo "Starting server in development mode..."
-	@. .venv/bin/activate && python -m uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+	@. .venv/bin/activate && IMAGE_DIR=/tmp/images CONFIG_DIR=/tmp/config PYTHONPATH="gen/python:." python -m uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 start-debug:
 	@echo "Starting server with debug mode..."
-	@. .venv/bin/activate && python -m uvicorn app:app --host 0.0.0.0 --port 8000 --reload --log-level debug
+	@. .venv/bin/activate && PYTHONPATH="gen/python:/home/lsm/Nextcloud/llmmllab:." python -m uvicorn app:app --host 0.0.0.0 --port 8000 --reload --log-level debug
 
 # =============================================================================
 # Proto Generation
@@ -74,16 +74,38 @@ proto:
 	@echo "Server proto code generated"
 
 # =============================================================================
+# PostgreSQL (Local Development)
+# =============================================================================
+
+postgres:
+	@echo "Starting PostgreSQL locally..."
+	@chmod +x ./k8s/postgres/init-db.sh
+	@docker compose -f k8s/postgres/local-docker-compose.yaml up -d
+	@echo "PostgreSQL started on port 5432"
+	@echo "Run 'make postgres-stop' to stop PostgreSQL"
+
+postgres-stop:
+	@echo "Stopping PostgreSQL..."
+	@docker compose -f k8s/postgres/local-docker-compose.yaml down
+	@echo "PostgreSQL stopped"
+
+# =============================================================================
+# Build
+# =============================================================================
+
+build-image:
+	@echo "Building server Docker image..."
+	@chmod +x ./k8s/build.sh
+	@DOCKER_TAG=$(shell git rev-parse --abbrev-ref HEAD | tr '/' '.') ./k8s/build.sh
+
+# =============================================================================
 # Deployment
 # =============================================================================
 
-deploy:
+deploy: build-image
 	@echo "Deploying server to k8s..."
-	@chmod +x ./k8s/build.sh
-	@$(eval BRANCH_NAME := $(shell git rev-parse --abbrev-ref HEAD | tr '/' '.'))
-	@echo "Using branch: $(BRANCH_NAME) for image tag"
-	@DOCKER_TAG=$(BRANCH_NAME) ./k8s/build.sh
-	@DOCKER_TAG=$(BRANCH_NAME) ./k8s/apply.sh
+	@chmod +x ./k8s/apply.sh
+	@DOCKER_TAG=$(shell git rev-parse --abbrev-ref HEAD | tr '/' '.') ./k8s/apply.sh
 	@kubectl rollout restart deployment llmmll-server -n llmmll --wait=true
 	@echo "Server deployed successfully"
 
@@ -125,6 +147,9 @@ help:
 	@echo "  start           - Start server in dev mode"
 	@echo "  start-debug     - Start server with debug logging"
 	@echo "  proto           - Generate proto code"
-	@echo "  deploy          - Deploy to k8s"
+	@echo "  postgres        - Start PostgreSQL locally (Docker Compose)"
+	@echo "  postgres-stop   - Stop PostgreSQL locally"
+	@echo "  build-image     - Build Docker image"
+	@echo "  deploy          - Build and deploy to k8s"
 	@echo "  clean           - Clean artifacts"
 	@echo "  help            - Show this help message"

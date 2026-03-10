@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_moderation_request import CreateModerationRequest
-from server.models.openai.create_moderation_response import CreateModerationResponse
+from models.openai.create_moderation_request import CreateModerationRequest
+from models.openai.create_moderation_response import CreateModerationResponse
 
 
 router = APIRouter(prefix="/moderations", tags=["Moderations"])

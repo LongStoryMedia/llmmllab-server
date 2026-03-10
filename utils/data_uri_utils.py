@@ -46,6 +46,7 @@ def parse_data_uri(data_uri: str) -> Optional[Tuple[str, str]]:
 def get_decoded_data(data_uri: str) -> Optional[str]:
     """Get decoded data from a data URI."""
     import base64
+
     match = DATA_URI_PATTERN.match(data_uri)
     if match:
         try:

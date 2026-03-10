@@ -5,7 +5,7 @@ FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONPATH="/app:/app/server/gen/python" \
+    PYTHONPATH="/app/server:/app/server/gen/python" \
     SERVER_DIR="/app/server" \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -34,6 +34,7 @@ COPY proto/ ./proto/
 # Generate gRPC code from proto files
 RUN python -m grpc_tools.protoc \
     -I ./proto \
+    -I /usr/local/lib/python3.12/site-packages \
     --python_out=./server/gen/python \
     --grpc_python_out=./server/gen/python \
     ./proto/composer/v1/server_composer.proto \
@@ -43,4 +44,4 @@ RUN python -m grpc_tools.protoc \
 EXPOSE 8000
 
 # Run server (FastAPI via uvicorn)
-CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "8000"]

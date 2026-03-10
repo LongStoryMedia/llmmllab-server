@@ -7,41 +7,43 @@ from typing import Any, Literal, TypeAlias, Union
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
-from server.middleware.auth import get_user_id
-from server.models.openai.chat_completion_deleted import ChatCompletionDeleted
-from server.models.openai.chat_completion_list import ChatCompletionList
-from server.models.openai.chat_completion_message_list import ChatCompletionMessageList
-from server.models.openai.chat_completion_message_custom_tool_call import (
+from middleware.auth import get_user_id
+from models.openai.chat_completion_deleted import ChatCompletionDeleted
+from models.openai.chat_completion_list import ChatCompletionList
+from models.openai.chat_completion_message_list import ChatCompletionMessageList
+from models.openai.chat_completion_message_custom_tool_call import (
     ChatCompletionMessageCustomToolCall,
 )
-from server.models.openai.chat_completion_message_tool_call import (
+from models.openai.chat_completion_message_tool_call import (
     ChatCompletionMessageToolCall,
     Function,
 )
-from server.models.openai.chat_completion_message_tool_calls import (
+from models.openai.chat_completion_message_tool_calls import (
     ChatCompletionMessageToolCalls,
 )
-from server.models.openai.chat_completion_message_tool_call_chunk import (
+from models.openai.chat_completion_message_tool_call_chunk import (
     ChatCompletionMessageToolCallChunk,
     Function as ChunkFunction,
 )
-from server.models.openai.chat_completion_response_message import (
+from models.openai.chat_completion_response_message import (
     ChatCompletionResponseMessage,
 )
-from server.models.openai.chat_completion_stream_response_delta import (
+from models.openai.chat_completion_stream_response_delta import (
     ChatCompletionStreamResponseDelta,
 )
-from server.models.openai.completion_usage import CompletionUsage
-from server.models.openai.create_chat_completion_request import CreateChatCompletionRequest
-from server.models.openai.create_chat_completion_response import (
+from models.openai.completion_usage import CompletionUsage
+from models.openai.create_chat_completion_request import (
+    CreateChatCompletionRequest,
+)
+from models.openai.create_chat_completion_response import (
     ChoicesItem,
     CreateChatCompletionResponse,
 )
-from server.models.openai.create_chat_completion_stream_response import (
+from models.openai.create_chat_completion_stream_response import (
     ChoicesItem as StreamChoicesItem,
     CreateChatCompletionStreamResponse,
 )
-from server.models.openai.chat_completion_request_message import (
+from models.openai.chat_completion_request_message import (
     ChatCompletionRequestMessage,
     ChatCompletionRequestMessageContentPartAudio,
     ChatCompletionRequestMessageContentPartFile,
@@ -55,15 +57,19 @@ from server.models.openai.chat_completion_request_message import (
     ChatCompletionRequestDeveloperMessage,
     ChatCompletionRequestSystemMessage,
 )
-from server.models.openai.chat_completion_tool import ChatCompletionTool
-from server.models.message import Message, MessageRole, MessageContent, MessageContentType
-from server.models.tool_call import ToolCall
-from server.models.chat_response import ChatResponse
-from server.utils.logging import llmmllogger
+from models.openai.chat_completion_tool import ChatCompletionTool
+from models.message import (
+    Message,
+    MessageRole,
+    MessageContent,
+    MessageContentType,
+)
+from models.tool_call import ToolCall
+from models.chat_response import ChatResponse
+from utils.logging import llmmllogger
 
-from composer.api.interface import ServerAdapter
-import composer
-from server import get_composer_client, get_runner_client
+from grpc_client import get_composer_client, get_runner_client
+
 
 def _grpc_chat_response_delta_to_internal(
     delta: Any,
@@ -72,18 +78,34 @@ def _grpc_chat_response_delta_to_internal(
     result = {
         "done": False,
         "created_at": None,
-        "finish_reason": delta.finish_reason if delta.HasField("finish_reason") else None,
-        "total_duration": delta.total_duration if delta.HasField("total_duration") else None,
-        "load_duration": delta.load_duration if delta.HasField("load_duration") else None,
-        "prompt_eval_count": delta.prompt_eval_count if delta.HasField("prompt_eval_count") else None,
-        "prompt_eval_duration": delta.prompt_eval_duration if delta.HasField("prompt_eval_duration") else None,
+        "finish_reason": (
+            delta.finish_reason if delta.HasField("finish_reason") else None
+        ),
+        "total_duration": (
+            delta.total_duration if delta.HasField("total_duration") else None
+        ),
+        "load_duration": (
+            delta.load_duration if delta.HasField("load_duration") else None
+        ),
+        "prompt_eval_count": (
+            delta.prompt_eval_count if delta.HasField("prompt_eval_count") else None
+        ),
+        "prompt_eval_duration": (
+            delta.prompt_eval_duration
+            if delta.HasField("prompt_eval_duration")
+            else None
+        ),
         "eval_count": delta.eval_count if delta.HasField("eval_count") else None,
-        "eval_duration": delta.eval_duration if delta.HasField("eval_duration") else None,
+        "eval_duration": (
+            delta.eval_duration if delta.HasField("eval_duration") else None
+        ),
         "processing": delta.processing if delta.HasField("processing") else None,
         "state": delta.state if delta.HasField("state") else None,
         "prev_state": delta.prev_state if delta.HasField("prev_state") else None,
         "metadata": None,
-        "observer_messages": list(delta.observer_messages) if delta.observer_messages else None,
+        "observer_messages": (
+            list(delta.observer_messages) if delta.observer_messages else None
+        ),
         "todos": None,
         "message": None,
     }
@@ -99,6 +121,7 @@ def _grpc_chat_response_delta_to_internal(
     # Convert todos
     if delta.todos:
         from models.todo_item import TodoItem
+
         result["todos"] = [
             TodoItem(
                 id=t.id,
@@ -136,18 +159,36 @@ def _grpc_chat_response_complete_to_internal(
     result = {
         "done": True,
         "created_at": None,
-        "finish_reason": complete.finish_reason if complete.HasField("finish_reason") else None,
-        "total_duration": complete.total_duration if complete.HasField("total_duration") else None,
-        "load_duration": complete.load_duration if complete.HasField("load_duration") else None,
-        "prompt_eval_count": complete.prompt_eval_count if complete.HasField("prompt_eval_count") else None,
-        "prompt_eval_duration": complete.prompt_eval_duration if complete.HasField("prompt_eval_duration") else None,
+        "finish_reason": (
+            complete.finish_reason if complete.HasField("finish_reason") else None
+        ),
+        "total_duration": (
+            complete.total_duration if complete.HasField("total_duration") else None
+        ),
+        "load_duration": (
+            complete.load_duration if complete.HasField("load_duration") else None
+        ),
+        "prompt_eval_count": (
+            complete.prompt_eval_count
+            if complete.HasField("prompt_eval_count")
+            else None
+        ),
+        "prompt_eval_duration": (
+            complete.prompt_eval_duration
+            if complete.HasField("prompt_eval_duration")
+            else None
+        ),
         "eval_count": complete.eval_count if complete.HasField("eval_count") else None,
-        "eval_duration": complete.eval_duration if complete.HasField("eval_duration") else None,
+        "eval_duration": (
+            complete.eval_duration if complete.HasField("eval_duration") else None
+        ),
         "processing": complete.processing if complete.HasField("processing") else None,
         "state": complete.state if complete.HasField("state") else None,
         "prev_state": complete.prev_state if complete.HasField("prev_state") else None,
         "metadata": None,
-        "observer_messages": list(complete.observer_messages) if complete.observer_messages else None,
+        "observer_messages": (
+            list(complete.observer_messages) if complete.observer_messages else None
+        ),
         "todos": None,
         "message": None,
     }
@@ -163,6 +204,7 @@ def _grpc_chat_response_complete_to_internal(
     # Convert todos
     if complete.todos:
         from models.todo_item import TodoItem
+
         result["todos"] = [
             TodoItem(
                 id=t.id,
@@ -190,9 +232,6 @@ async def _execute_workflow_grpc(
         The final ChatResponse from the workflow, or None if no response produced
     """
     from server_composer.v1 import server_composer_pb2
-    from models.chat_response import ChatResponse
-    from models.message import Message, MessageContent, MessageContentType
-    from models.tool_call import ToolCall
 
     client = get_composer_client()
 
@@ -203,7 +242,7 @@ async def _execute_workflow_grpc(
         variables=initial_state.get("variables", {}),
     )
 
-    request = server_composer_pb2.ExecuteWorkflowRequest(
+    _ = server_composer_pb2.ExecuteWorkflowRequest(
         workflow_id=workflow_id,
         initial_state=state,
         stream_events=True,
@@ -272,8 +311,6 @@ async def stream_chat_completion_grpc(
     tool_choice: str | None = None,
 ) -> AsyncIterator[str]:
     """Stream composer events via gRPC as OpenAI SSE chat completion chunks."""
-    import json
-    from datetime import datetime
     from server_composer.v1 import server_composer_pb2
 
     # Get composer client and compose workflow via gRPC
@@ -438,6 +475,7 @@ async def stream_chat_completion_grpc(
     )
     yield f"data: {final_chunk.model_dump_json(exclude_none=True)}\n\n"
     yield "data: [DONE]\n\n"
+
 
 OAIFinishReason: TypeAlias = Literal[
     "stop", "length", "tool_calls", "content_filter", "function_call"

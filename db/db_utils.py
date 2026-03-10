@@ -13,7 +13,7 @@ from typing import (
 )
 
 import asyncpg
-from .connection_recovery import ConnectionRecoveryManager
+from db.connection_recovery import ConnectionRecoveryManager
 from asyncpg.protocol import Record
 
 T = TypeVar("T")
@@ -104,5 +104,7 @@ def get_recovery_manager(pool: asyncpg.Pool) -> ConnectionRecoveryManager:
     """
     # Store recovery manager in pool's __dict__ for retrieval
     if not hasattr(pool, "_recovery_manager"):
-        pool._recovery_manager = ConnectionRecoveryManager(pool)  # pyright: ignore[reportAttributeAccessIssue]
+        pool._recovery_manager = ConnectionRecoveryManager(
+            pool
+        )  # pyright: ignore[reportAttributeAccessIssue]
     return pool._recovery_manager  # pyright: ignore[reportAttributeAccessIssue]

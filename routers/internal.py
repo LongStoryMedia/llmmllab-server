@@ -7,7 +7,7 @@ import os
 import logging
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.responses import FileResponse
-from server.config import IMAGE_DIR, INTERNAL_ALLOWED_IPS, INTERNAL_API_KEY, logger
+from config import IMAGE_DIR, INTERNAL_ALLOWED_IPS, INTERNAL_API_KEY, logger
 import ipaddress
 from typing import Any
 

@@ -14,6 +14,8 @@ spec:
       labels:
         app: llmmll-server
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: server
           image: 192.168.0.71:31500/server:latest
@@ -31,7 +33,7 @@ spec:
               cpu: "2"
           env:
             - name: PYTHONPATH
-              value: "/app"
+              value: "/app/server:/app/server/gen/python"
             - name: SERVER_DIR
               value: "/app/server"
 
@@ -41,18 +43,24 @@ spec:
 
             # Database configuration
             - name: DB_HOST
-              value: "192.168.0.71"
+              value: "postgres.llmmll.svc.cluster.local"
             - name: DB_PORT
-              value: "32345"
+              value: "5432"
             - name: DB_USER
-              value: "lsm"
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: db-credentials
-                  key: password
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
             - name: DB_NAME
-              value: "llmmll"
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_DB
             - name: DB_SSLMODE
               value: "disable"
 

@@ -3,6 +3,7 @@ Unit tests for server/middleware/auth.py.
 
 Tests JWT validation, API key validation, and authentication middleware.
 """
+
 import pytest
 import time
 import uuid
@@ -10,7 +11,7 @@ from unittest.mock import AsyncMock, MagicMock, patch, Mock
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from server.middleware.auth import (
+from middleware.auth import (
     JWTValidator,
     ApiKeyValidator,
     AuthMiddleware,
@@ -38,7 +39,7 @@ def mock_jwt_validator_config(mocker):
     validator = JWTValidator(jwks_uri="https://example.com/.well-known/jwks.json")
 
     # Mock the httpx client
-    mock_httpx = mocker.patch('server.middleware.auth.httpx.AsyncClient')
+    mock_httpx = mocker.patch("server.middleware.auth.httpx.AsyncClient")
     mock_response = MagicMock()
     mock_response.json.return_value = {
         "keys": [
@@ -47,7 +48,7 @@ def mock_jwt_validator_config(mocker):
                 "alg": "RS256",
                 "kty": "RSA",
                 "n": "test_modulus",
-                "e": "AQAB"
+                "e": "AQAB",
             }
         ]
     }
@@ -90,16 +91,18 @@ class TestJWTValidator:
         assert validator.cache_timeout == 3600
 
     @pytest.mark.asyncio
-    async def test_get_jwks_fetches_from_cache_when_valid(self, mock_jwt_validator_config):
+    async def test_get_jwks_fetches_from_cache_when_valid(
+        self, mock_jwt_validator_config
+    ):
         """Test JWKS is fetched from cache when not expired."""
         validator = mock_jwt_validator_config
 
         # First call - should fetch
-        with patch('server.middleware.auth.time.time', return_value=1000.0):
+        with patch("server.middleware.auth.time.time", return_value=1000.0):
             jwks1 = await validator._get_jwks(force_refresh=False)
 
         # Second call - should use cache
-        with patch('server.middleware.auth.time.time', return_value=1000.0):
+        with patch("server.middleware.auth.time.time", return_value=1000.0):
             jwks2 = await validator._get_jwks(force_refresh=False)
 
         assert jwks1 == jwks2
@@ -109,12 +112,14 @@ class TestJWTValidator:
         """Test JWKS is refreshed when cache expires."""
         validator = mock_jwt_validator_config
 
-        with patch('server.middleware.auth.time.time', return_value=1000.0):
+        with patch("server.middleware.auth.time.time", return_value=1000.0):
             await validator._get_jwks(force_refresh=False)
 
         # Simulate cache expiration
-        with patch('server.middleware.auth.time.time', return_value=5000.0):
-            with patch.object(validator, '_fetch_jwks', wraps=validator._fetch_jwks) as mock_fetch:
+        with patch("server.middleware.auth.time.time", return_value=5000.0):
+            with patch.object(
+                validator, "_fetch_jwks", wraps=validator._fetch_jwks
+            ) as mock_fetch:
                 await validator._get_jwks(force_refresh=False)
                 mock_fetch.assert_called_once()
 
@@ -124,13 +129,16 @@ class TestJWTValidator:
         validator = mock_jwt_validator_config
 
         # Mock jwt.get_unverified_header to return a valid header with kid
-        mocker.patch('server.middleware.auth.jwt.get_unverified_header', return_value={"kid": "test-kid", "alg": "RS256"})
+        mocker.patch(
+            "server.middleware.auth.jwt.get_unverified_header",
+            return_value={"kid": "test-kid", "alg": "RS256"},
+        )
         # Mock jwt.decode to return a valid payload
-        mock_decode = mocker.patch('server.middleware.auth.jwt.decode')
+        mock_decode = mocker.patch("server.middleware.auth.jwt.decode")
         mock_decode.return_value = {
             "sub": "test-user-id",
             "groups": ["users"],
-            "exp": int(time.time()) + 3600
+            "exp": int(time.time()) + 3600,
         }
 
         result = await validator.validate_token("fake.jwt.token")
@@ -144,12 +152,15 @@ class TestJWTValidator:
         """Test admin user validation."""
         validator = mock_jwt_validator_config
 
-        mocker.patch('server.middleware.auth.jwt.get_unverified_header', return_value={"kid": "test-kid", "alg": "RS256"})
-        mock_decode = mocker.patch('server.middleware.auth.jwt.decode')
+        mocker.patch(
+            "server.middleware.auth.jwt.get_unverified_header",
+            return_value={"kid": "test-kid", "alg": "RS256"},
+        )
+        mock_decode = mocker.patch("server.middleware.auth.jwt.decode")
         mock_decode.return_value = {
             "sub": "admin-user",
             "groups": ["admins", "users"],
-            "exp": int(time.time()) + 3600
+            "exp": int(time.time()) + 3600,
         }
 
         result = await validator.validate_token("fake.jwt.token")
@@ -162,7 +173,9 @@ class TestJWTValidator:
         validator = mock_jwt_validator_config
 
         # Mock header to return empty kid
-        mocker.patch('server.middleware.auth.jwt.get_unverified_header', return_value={})
+        mocker.patch(
+            "server.middleware.auth.jwt.get_unverified_header", return_value={}
+        )
 
         with pytest.raises(HTTPException) as exc_info:
             await validator.validate_token("fake.jwt.token")
@@ -171,12 +184,20 @@ class TestJWTValidator:
         assert "key ID" in exc_info.value.detail
 
     @pytest.mark.asyncio
-    async def test_validate_token_invalid_signature(self, mock_jwt_validator_config, mocker):
+    async def test_validate_token_invalid_signature(
+        self, mock_jwt_validator_config, mocker
+    ):
         """Test validation fails with invalid signature."""
         validator = mock_jwt_validator_config
 
-        mocker.patch('server.middleware.auth.jwt.get_unverified_header', return_value={"kid": "test-kid"})
-        mocker.patch('server.middleware.auth.jwt.decode', side_effect=Exception("Invalid signature"))
+        mocker.patch(
+            "server.middleware.auth.jwt.get_unverified_header",
+            return_value={"kid": "test-kid"},
+        )
+        mocker.patch(
+            "server.middleware.auth.jwt.decode",
+            side_effect=Exception("Invalid signature"),
+        )
 
         with pytest.raises(HTTPException) as exc_info:
             await validator.validate_token("invalid.token")
@@ -184,18 +205,26 @@ class TestJWTValidator:
         assert exc_info.value.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_validate_token_refreshes_on_key_not_found(self, mock_jwt_validator_config, mocker):
+    async def test_validate_token_refreshes_on_key_not_found(
+        self, mock_jwt_validator_config, mocker
+    ):
         """Test validation refreshes JWKS when key not found in cache."""
         validator = mock_jwt_validator_config
 
         # Mock jwt.get_unverified_header to return a valid header with kid
-        mocker.patch('server.middleware.auth.jwt.get_unverified_header', return_value={"kid": "test-kid", "alg": "RS256"})
+        mocker.patch(
+            "server.middleware.auth.jwt.get_unverified_header",
+            return_value={"kid": "test-kid", "alg": "RS256"},
+        )
         # Mock the decode to succeed
-        mocker.patch('server.middleware.auth.jwt.decode', return_value={
-            "sub": "test-user",
-            "groups": ["users"],
-            "exp": int(time.time()) + 3600
-        })
+        mocker.patch(
+            "server.middleware.auth.jwt.decode",
+            return_value={
+                "sub": "test-user",
+                "groups": ["users"],
+                "exp": int(time.time()) + 3600,
+            },
+        )
 
         # Track if _get_jwks was called with force_refresh=True
         original_get_jwks = validator._get_jwks
@@ -208,9 +237,15 @@ class TestJWTValidator:
             return {"keys": [{"kid": "other-kid", "alg": "RS256", "kty": "RSA"}]}
 
         # Mock _get_key_from_jwks to always raise (simulate key not found)
-        mocker.patch.object(validator, '_get_key_from_jwks', side_effect=HTTPException(status_code=401, detail="Unable to find appropriate key"))
+        mocker.patch.object(
+            validator,
+            "_get_key_from_jwks",
+            side_effect=HTTPException(
+                status_code=401, detail="Unable to find appropriate key"
+            ),
+        )
 
-        with patch.object(validator, '_get_jwks', side_effect=mock_get_jwks):
+        with patch.object(validator, "_get_jwks", side_effect=mock_get_jwks):
             with pytest.raises(HTTPException) as exc_info:
                 await validator.validate_token("fake.jwt.token")
 
@@ -223,7 +258,9 @@ class TestApiKeyValidator:
     """Tests for ApiKeyValidator class."""
 
     @pytest.mark.asyncio
-    async def test_validate_api_key_success(self, mock_jwt_validator_config, mock_api_key_storage, mocker):
+    async def test_validate_api_key_success(
+        self, mock_jwt_validator_config, mock_api_key_storage, mocker
+    ):
         """Test successful API key validation."""
         validator = ApiKeyValidator()
 
@@ -233,7 +270,9 @@ class TestApiKeyValidator:
         mock_api_key.scopes = ["read", "write"]
         mock_api_key_storage.validate_api_key.return_value = mock_api_key
 
-        mocker.patch.object(validator, '_get_api_key_storage', return_value=mock_api_key_storage)
+        mocker.patch.object(
+            validator, "_get_api_key_storage", return_value=mock_api_key_storage
+        )
 
         result = await validator.validate_api_key("valid-api-key")
 
@@ -242,20 +281,26 @@ class TestApiKeyValidator:
         assert "read" in result.claims["scopes"]
 
     @pytest.mark.asyncio
-    async def test_validate_api_key_invalid(self, mock_jwt_validator_config, mock_api_key_storage, mocker):
+    async def test_validate_api_key_invalid(
+        self, mock_jwt_validator_config, mock_api_key_storage, mocker
+    ):
         """Test invalid API key handling."""
         validator = ApiKeyValidator()
 
         mock_api_key_storage.validate_api_key.return_value = None
 
-        mocker.patch.object(validator, '_get_api_key_storage', return_value=mock_api_key_storage)
+        mocker.patch.object(
+            validator, "_get_api_key_storage", return_value=mock_api_key_storage
+        )
 
         result = await validator.validate_api_key("invalid-key")
 
         assert result is None
 
     @pytest.mark.asyncio
-    async def test_validate_api_key_lazy_initialization(self, mock_jwt_validator_config, mocker):
+    async def test_validate_api_key_lazy_initialization(
+        self, mock_jwt_validator_config, mocker
+    ):
         """Test that storage is lazily initialized."""
         import sys
         from unittest.mock import MagicMock
@@ -275,7 +320,7 @@ class TestApiKeyValidator:
         mock_db_module.storage = mock_storage_instance
 
         # Add the mock db module to sys.modules before the import happens
-        sys.modules['db'] = mock_db_module
+        sys.modules["db"] = mock_db_module
 
         try:
             # First access should initialize
@@ -285,15 +330,17 @@ class TestApiKeyValidator:
             assert validator._api_key_storage == mock_api_key_service
         finally:
             # Clean up sys.modules
-            if 'db' in sys.modules:
-                del sys.modules['db']
+            if "db" in sys.modules:
+                del sys.modules["db"]
 
 
 class TestAuthMiddleware:
     """Tests for AuthMiddleware class."""
 
     @pytest.mark.asyncio
-    async def test_authenticate_jwt_success(self, mock_jwt_validator_config, mock_request, mocker):
+    async def test_authenticate_jwt_success(
+        self, mock_jwt_validator_config, mock_request, mocker
+    ):
         """Test successful JWT authentication."""
         # Reset singleton
         AuthMiddlewareSingleton.reset_instance()
@@ -302,11 +349,11 @@ class TestAuthMiddleware:
 
         # Mock the validator
         mock_result = TokenValidationResult(
-            user_id="test-user",
-            claims={},
-            is_admin=False
+            user_id="test-user", claims={}, is_admin=False
         )
-        mocker.patch.object(middleware.validator, 'validate_token', return_value=mock_result)
+        mocker.patch.object(
+            middleware.validator, "validate_token", return_value=mock_result
+        )
 
         # Set Authorization header with Bearer token
         mock_request.headers["Authorization"] = "Bearer test.jwt.token"
@@ -317,7 +364,9 @@ class TestAuthMiddleware:
         assert mock_request.state.auth[ContextKey.USER_ID] == "test-user"
 
     @pytest.mark.asyncio
-    async def test_authenticate_api_key_success(self, mock_jwt_validator_config, mock_request, mocker):
+    async def test_authenticate_api_key_success(
+        self, mock_jwt_validator_config, mock_request, mocker
+    ):
         """Test successful API key authentication."""
         AuthMiddlewareSingleton.reset_instance()
 
@@ -325,11 +374,11 @@ class TestAuthMiddleware:
 
         # Mock API key validator
         mock_result = TokenValidationResult(
-            user_id="api-user",
-            claims={"type": "api_key"},
-            is_admin=False
+            user_id="api-user", claims={"type": "api_key"}, is_admin=False
         )
-        mocker.patch.object(middleware.api_key_validator, 'validate_api_key', return_value=mock_result)
+        mocker.patch.object(
+            middleware.api_key_validator, "validate_api_key", return_value=mock_result
+        )
 
         # Set X-API-Key header (the auth middleware checks Authorization first, then X-API-Key)
         # Need to trigger the X-API-Key path by first making Authorization fail, then X-API-Key succeeds
@@ -342,7 +391,9 @@ class TestAuthMiddleware:
         assert result.user_id == "api-user"
 
     @pytest.mark.asyncio
-    async def test_authenticate_no_auth_header(self, mock_jwt_validator_config, mock_request):
+    async def test_authenticate_no_auth_header(
+        self, mock_jwt_validator_config, mock_request
+    ):
         """Test authentication fails without auth header."""
         AuthMiddlewareSingleton.reset_instance()
 
@@ -354,7 +405,9 @@ class TestAuthMiddleware:
         assert exc_info.value.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_authenticate_invalid_token_falls_back_to_api_key(self, mock_jwt_validator_config, mock_request, mocker):
+    async def test_authenticate_invalid_token_falls_back_to_api_key(
+        self, mock_jwt_validator_config, mock_request, mocker
+    ):
         """Test authentication falls back to API key when JWT fails."""
         AuthMiddlewareSingleton.reset_instance()
 
@@ -362,17 +415,18 @@ class TestAuthMiddleware:
 
         # Mock JWT to fail
         mocker.patch.object(
-            middleware.validator, 'validate_token',
-            side_effect=HTTPException(status_code=401, detail="Invalid token")
+            middleware.validator,
+            "validate_token",
+            side_effect=HTTPException(status_code=401, detail="Invalid token"),
         )
 
         # Mock API key to succeed
         mock_result = TokenValidationResult(
-            user_id="api-user",
-            claims={"type": "api_key"},
-            is_admin=False
+            user_id="api-user", claims={"type": "api_key"}, is_admin=False
         )
-        mocker.patch.object(middleware.api_key_validator, 'validate_api_key', return_value=mock_result)
+        mocker.patch.object(
+            middleware.api_key_validator, "validate_api_key", return_value=mock_result
+        )
 
         # Set Bearer token (will fail)
         mock_request.headers["Authorization"] = "Bearer invalid.token"
@@ -387,8 +441,12 @@ class TestAuthMiddlewareSingleton:
 
     def test_singleton_returns_same_instance(self, mock_jwt_validator_config):
         """Test singleton returns same instance on multiple calls."""
-        instance1 = AuthMiddlewareSingleton.get_instance(jwks_uri="https://example.com/jwks")
-        instance2 = AuthMiddlewareSingleton.get_instance(jwks_uri="https://example.com/jwks")
+        instance1 = AuthMiddlewareSingleton.get_instance(
+            jwks_uri="https://example.com/jwks"
+        )
+        instance2 = AuthMiddlewareSingleton.get_instance(
+            jwks_uri="https://example.com/jwks"
+        )
 
         assert instance1 is instance2
 
@@ -397,7 +455,9 @@ class TestAuthMiddlewareSingleton:
         AuthMiddlewareSingleton.get_instance(jwks_uri="https://example.com/jwks")
         AuthMiddlewareSingleton.reset_instance()
 
-        instance = AuthMiddlewareSingleton.get_instance(jwks_uri="https://example.com/jwks")
+        instance = AuthMiddlewareSingleton.get_instance(
+            jwks_uri="https://example.com/jwks"
+        )
         # Should be a new instance
         assert instance is not None
 
@@ -407,7 +467,9 @@ class TestUtilityFunctions:
 
     def test_get_user_id_auth_disabled(self, mock_request, mocker):
         """Test get_user_id when auth is disabled."""
-        mocker.patch.dict('os.environ', {'DISABLE_AUTH': 'true', 'TEST_USER_ID': 'test-user'})
+        mocker.patch.dict(
+            "os.environ", {"DISABLE_AUTH": "true", "TEST_USER_ID": "test-user"}
+        )
 
         user_id = get_user_id(mock_request)
 
@@ -423,7 +485,7 @@ class TestUtilityFunctions:
 
     def test_is_admin_auth_disabled(self, mock_request, mocker):
         """Test is_admin when auth is disabled."""
-        mocker.patch.dict('os.environ', {'DISABLE_AUTH': 'true'})
+        mocker.patch.dict("os.environ", {"DISABLE_AUTH": "true"})
 
         assert is_admin(mock_request) is True
 

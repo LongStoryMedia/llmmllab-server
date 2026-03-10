@@ -1,6 +1,7 @@
 """Document API endpoints."""
 
 import base64
+from datetime import datetime as dt
 from typing import List
 from fastapi import (
     APIRouter,
@@ -12,11 +13,12 @@ from fastapi import (
 )
 from fastapi.responses import Response
 
-from server.models.document import Document
-from server.utils.logging import llmmllogger
-from server.utils.text_extraction import extract_text_content, get_file_metadata
-from server.middleware.auth import get_user_id
-from server.db import storage
+from models.document import Document
+from models.message import Message, MessageRole
+from utils.logging import llmmllogger
+from utils.text_extraction import extract_text_content, get_file_metadata
+from middleware.auth import get_user_id
+from db import storage
 
 logger = llmmllogger.bind(component="document_router")
 
@@ -60,9 +62,19 @@ async def upload_document(
         content_type = file.content_type or "application/octet-stream"
         text_content = extract_text_content(content_base64, content_type, filename)
 
-        # Store the document
-        document = await storage.document.store_document(
+        # Store the document - first create a message to get message_id
+        msg = Message(
+            id=0,  # Will be set by database
+            user_id=user_id,
             conversation_id=conversation_id,
+            role=MessageRole.USER,
+            content=[],
+            created_at=dt.now(),
+            updated_at=dt.now(),
+        )
+        message_id = await storage.message.add_message(msg)
+        document = await storage.document.store_document(
+            message_id=message_id,
             user_id=user_id,
             filename=filename,
             content_type=content_type,
@@ -117,7 +129,9 @@ async def upload_document(
 
     except Exception as e:
         logger.error(f"Failed to upload document: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload file: {str(e)}"
+        ) from e
 
 
 @router.get("/{document_id}", response_model=Document)
@@ -169,7 +183,9 @@ async def download_document(
         )
     except Exception as e:
         logger.error(f"Failed to decode document content: {e}")
-        raise HTTPException(status_code=500, detail="Failed to decode file content")
+        raise HTTPException(
+            status_code=500, detail="Failed to decode file content"
+        ) from e
 
 
 @router.get("/conversation/{conversation_id}", response_model=List[Document])

@@ -61,4 +61,5 @@ def get_file_extension(mime_type: str) -> str:
 def get_file_extension_from_filename(filename: str) -> str:
     """Get file extension from filename."""
     import os
+
     return os.path.splitext(filename)[1].lower()

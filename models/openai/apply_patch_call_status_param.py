@@ -7,6 +7,8 @@ from datetime import datetime, date, time, timedelta
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, constr
 
+# No relative imports - file only imports from enum and pydantic
+
 
 
 class ApplyPatchCallStatusParam(str, Enum):

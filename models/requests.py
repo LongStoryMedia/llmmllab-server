@@ -2,8 +2,8 @@ from typing import List, Optional
 from numpy import negative
 from pydantic import BaseModel
 
-from .dev_stats import DevStats
-from .model import Model
+from models.dev_stats import DevStats
+from models.model import Model
 
 
 class PromptRequest(BaseModel):

@@ -4,7 +4,7 @@ Logging utilities for the server application.
 
 import logging
 import os
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 class LLMMLLogger:
@@ -13,6 +13,7 @@ class LLMMLLogger:
     def __init__(self, name: str = "llmmllab"):
         self._logger = logging.getLogger(name)
         self._logger.setLevel(self._get_log_level())
+        self._bound_context: Dict[str, Any] = {}
         self._configure_handler()
 
     def _get_log_level(self) -> int:

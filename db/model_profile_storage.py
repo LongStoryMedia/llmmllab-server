@@ -8,11 +8,11 @@ import json
 import logging
 from typing import Callable, List, Optional
 import asyncpg
-from server.models.model_profile import ModelProfile
-from server.models.default_model_profiles import DEFAULT_PROFILES
-from server.db.connection_recovery import ConnectionRecoveryManager, recovery_manager
-from server.db.db_utils import typed_pool
-from .serialization import serialize_to_json
+from models.model_profile import ModelProfile
+from models.default_model_profiles import DEFAULT_PROFILES
+from db.connection_recovery import ConnectionRecoveryManager, recovery_manager
+from db.db_utils import typed_pool
+from db.serialization import serialize_to_json
 
 logger = logging.getLogger(__name__)
 

@@ -4,32 +4,34 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .circuit_breaker_config import CircuitBreakerConfig
-from .crash_prevention import CrashPrevention
-from .event_stream_config import EventStreamConfig
-from .gpu_config import GPUConfig
-from .image_generation_config import ImageGenerationConfig
-from .memory_config import MemoryConfig
-from .model_profile_config import ModelProfileConfig
-from .parameter_optimization_config import ParameterOptimizationConfig
-from .parameter_tuning_strategy import ParameterTuningStrategy
-from .performance_parameter import PerformanceParameter
-from .preferences_config import PreferencesConfig
-from .summarization_config import SummarizationConfig
-from .tool_config import ToolConfig
-from .workflow_config import WorkflowConfig
+from models.circuit_breaker_config import CircuitBreakerConfig
+from models.crash_prevention import CrashPrevention
+from models.event_stream_config import EventStreamConfig
+from models.gpu_config import GPUConfig
+from models.image_generation_config import ImageGenerationConfig
+from models.memory_config import MemoryConfig
+from models.model_profile_config import ModelProfileConfig
+from models.parameter_optimization_config import ParameterOptimizationConfig
+from models.parameter_tuning_strategy import ParameterTuningStrategy
+from models.performance_parameter import PerformanceParameter
+from models.preferences_config import PreferencesConfig
+from models.summarization_config import SummarizationConfig
+from models.tool_config import ToolConfig
+from models.workflow_config import WorkflowConfig
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
-
 
 
 class UserConfig(BaseModel):
     """User-specific configuration"""
+
     user_id: Annotated[str, Field(..., description="User ID")]
     """User ID"""
     summarization: Annotated[Optional[SummarizationConfig], Field(default=None)] = None
     memory: Annotated[Optional[MemoryConfig], Field(default=None)] = None
     model_profiles: Annotated[Optional[ModelProfileConfig], Field(default=None)] = None
-    image_generation: Annotated[Optional[ImageGenerationConfig], Field(default=None)] = None
+    image_generation: Annotated[
+        Optional[ImageGenerationConfig], Field(default=None)
+    ] = None
     circuit_breaker: Annotated[CircuitBreakerConfig, Field(...)]
     gpu_config: Annotated[GPUConfig, Field(...)]
     parameter_optimization: Annotated[ParameterOptimizationConfig, Field(...)]

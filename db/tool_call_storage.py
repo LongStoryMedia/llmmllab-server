@@ -6,9 +6,9 @@ Tool calls represent execution results from tools associated with messages.
 import asyncpg
 from typing import List, Optional
 from datetime import datetime, timezone
-from ..models.tool_call import ToolCall
-from .db_utils import TypedConnection, typed_pool
-from ..utils.logging import llmmllogger
+from models.tool_call import ToolCall
+from db.db_utils import TypedConnection, typed_pool
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="tool_call_storage")
 

@@ -1,0 +1,24 @@
+# PostgreSQL Ingress - Traditional Ingress (not used with nginx-gateway)
+# This file is kept for reference but is not applied in the nginx-gateway setup
+# For nginx-gateway, use HTTPRoute resources instead
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: postgres-ingress
+  namespace: llmmll
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: postgres.llmmll.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: postgres
+                port:
+                  number: 5432

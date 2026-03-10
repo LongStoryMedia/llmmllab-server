@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.chat_session_resource import ChatSessionResource
-from server.models.openai.create_chat_session_body import CreateChatSessionBody
-from server.models.openai.deleted_thread_resource import DeletedThreadResource
-from server.models.openai.thread_item_list_resource import ThreadItemListResource
-from server.models.openai.thread_list_resource import ThreadListResource
-from server.models.openai.thread_resource import ThreadResource
+from models.openai.chat_session_resource import ChatSessionResource
+from models.openai.create_chat_session_body import CreateChatSessionBody
+from models.openai.deleted_thread_resource import DeletedThreadResource
+from models.openai.thread_item_list_resource import ThreadItemListResource
+from models.openai.thread_list_resource import ThreadListResource
+from models.openai.thread_resource import ThreadResource
 
 
 router = APIRouter(prefix="/chatkit", tags=["Chatkit"])

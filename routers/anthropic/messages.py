@@ -8,31 +8,27 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import ValidationError
 
-from server.middleware.auth import get_user_id
-from server.models.anthropic.create_message_request import CreateMessageRequest
-from server.models.anthropic.message_response import MessageResponse
-from server.models.anthropic.count_tokens_request import CountTokensRequest
-from server.models.anthropic.count_tokens_response import CountTokensResponse
-from server.models.anthropic.output_content_block import OutputContentBlock
-from server.models.anthropic.text_content_block import TextContentBlock
-from server.models.anthropic.tool_use_content_block import ToolUseContentBlock
-from server.models.anthropic.thinking_content_block import ThinkingContentBlock
-from server.models.anthropic.usage import Usage
-from server.models.message import Message, MessageRole, MessageContent, MessageContentType
-from server.models.tool_call import ToolCall
-from server.models.chat_response import ChatResponse
-from composer.api.interface import ServerAdapter
-from composer import (
-    compose_workflow,
-    create_initial_state,
-    execute_workflow,
-    get_graph_builder,
+from middleware.auth import get_user_id
+from models.anthropic.create_message_request import CreateMessageRequest
+from models.anthropic.message_response import MessageResponse
+from models.anthropic.count_tokens_request import CountTokensRequest
+from models.anthropic.count_tokens_response import CountTokensResponse
+from models.anthropic.output_content_block import OutputContentBlock
+from models.anthropic.text_content_block import TextContentBlock
+from models.anthropic.tool_use_content_block import ToolUseContentBlock
+from models.anthropic.thinking_content_block import ThinkingContentBlock
+from models.anthropic.usage import Usage
+from models.message import (
+    Message,
+    MessageRole,
+    MessageContent,
+    MessageContentType,
 )
-from composer.graph.workflows.factory import WorkFlowType
-from runner import pipeline_factory
-from runner.pipelines.llamacpp.chat import ChatLlamaCppPipeline
-from server.utils.logging import llmmllogger
+from models.tool_call import ToolCall
+from models.chat_response import ChatResponse
+from utils.logging import llmmllogger
 
+from grpc_client import get_composer_client, get_runner_client
 
 logger = llmmllogger.bind(component="anthropic_messages_router")
 router = APIRouter(prefix="/messages", tags=["Messages"])
@@ -261,22 +257,29 @@ async def stream_message(
       message_start → ping → content_block_start → content_block_delta(s)
       → content_block_stop → message_delta → message_stop
     """
-    # Get user config from storage layer
+    # Get user config from storage layer - user_config is available for future use
     from db import storage
 
-    user_config = await storage.get_service(storage.user_config).get_user_config(
-        user_id
-    )
-    # Get builder with user_config
-    builder = await get_graph_builder(WorkFlowType.IDE, user_id, user_config)
-    workflow = await compose_workflow(
+    _ = await storage.get_service(storage.user_config).get_user_config(user_id)
+    # Get composer client and compose workflow via gRPC
+    client = get_composer_client()
+
+    # Create initial state via gRPC
+    initial_state = await client.create_initial_state(
         user_id=user_id,
-        builder=builder,
+        conversation_id=0,
+        workflow_type="ide",
+    )
+
+    # Compose workflow via gRPC
+    compose_result = await client.compose_workflow(
+        user_id=user_id,
+        workflow_type="ide",
         model_name=model_name,
         client_tools=client_tools,
         tool_choice=tool_choice,
     )
-    initial_state = await create_initial_state(user_id, 0, builder, messages)
+    workflow_id = compose_result["workflow_id"]
 
     msg_id = f"msg_{uuid.uuid4().hex[:24]}"
 
@@ -307,7 +310,11 @@ async def stream_message(
     input_tokens = 0
     output_tokens = 0
 
-    async for event in execute_workflow(initial_state, workflow):
+    async for event in client.execute_workflow(
+        workflow_id=workflow_id,
+        initial_state=initial_state,
+        stream_events=True,
+    ):
         if event.done:
             if event.message and event.message.tool_calls:
                 final_tool_calls = event.message.tool_calls
@@ -485,22 +492,31 @@ async def createMessage(
             )
 
         # Non-streaming response
-        builder = await get_graph_builder(WorkFlowType.IDE, user_id)
-        workflow = await compose_workflow(
+        client = get_composer_client()
+
+        # Create initial state via gRPC
+        initial_state = await client.create_initial_state(
             user_id=user_id,
-            builder=builder,
+            conversation_id=0,
+            workflow_type="ide",
+        )
+
+        # Compose workflow via gRPC
+        compose_result = await client.compose_workflow(
+            user_id=user_id,
+            workflow_type="ide",
             model_name=body.model,
             client_tools=client_tools,
             tool_choice=tool_choice,
         )
-        initial_state = await create_initial_state(
-            user_id,
-            0,
-            builder,
-            internal_messages,
-        )
+        workflow_id = compose_result["workflow_id"]
+
         chat_response: ChatResponse | None = None
-        async for event in execute_workflow(initial_state, workflow):
+        async for event in client.execute_workflow(
+            workflow_id=workflow_id,
+            initial_state=initial_state,
+            stream_events=True,
+        ):
             if event.done and event.message:
                 chat_response = event
         if chat_response is None:
@@ -521,11 +537,11 @@ async def createMessage(
         )
     except ValidationError as ve:
         logger.error(f"Validation error in createMessage request: {ve.json()}")
-        raise HTTPException(status_code=422, detail=json.loads(ve.json()))
+        raise HTTPException(status_code=422, detail=json.loads(ve.json())) from ve
 
     except Exception as e:
         logger.error(f"Error processing createMessage request: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.post("/count_tokens")
@@ -535,8 +551,8 @@ async def countTokens(
 ) -> CountTokensResponse:
     """Operation ID: countTokens
 
-    Estimates the token count for a message request by forwarding the
-    rendered text to the running llama-server's /tokenize endpoint.
+    Estimates the token count for a message request using a simple heuristic.
+    This provides a reasonable estimate without requiring a running pipeline.
     """
     user_id = get_user_id(request)
 
@@ -568,42 +584,12 @@ async def countTokens(
 
         combined_text = "\n".join(parts)
 
-        # Try to reach the running llama-server's /tokenize endpoint
-        # via the cached pipeline's server_manager for accurate counts.
-        token_count: int | None = None
-        try:
-            cache = pipeline_factory.local_cache
-            with cache._lock:
-                for entry in cache._cache.values():
-                    pipeline = entry.pipeline
-                    if (
-                        isinstance(pipeline, ChatLlamaCppPipeline)
-                        and pipeline.server_manager
-                    ):
-                        server_url = pipeline.server_manager.server_url
-                        break
-                else:
-                    server_url = None
-
-            if server_url:
-                async with httpx.AsyncClient(timeout=10) as client:
-                    resp = await client.post(
-                        f"{server_url}/tokenize",
-                        json={"content": combined_text},
-                    )
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        tokens = data.get("tokens", [])
-                        token_count = len(tokens)
-        except Exception as e:
-            logger.debug(f"llama-server tokenize unavailable, using estimate: {e}")
-
-        # Fallback: rough estimate (~4 chars per token, common for BPE tokenizers)
-        if token_count is None:
-            token_count = max(1, len(combined_text) // 4)
+        # Simple token estimation: ~4 chars per token is a reasonable heuristic
+        # for most BPE tokenizers used with Llama models
+        token_count = max(1, len(combined_text) // 4)
 
         return CountTokensResponse(input_tokens=token_count)
 
     except Exception as e:
         logger.error(f"Error in countTokens: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e

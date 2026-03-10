@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.complete_upload_request import CompleteUploadRequest
-from server.models.openai.create_upload_request import CreateUploadRequest
-from server.models.openai.upload import Upload
-from server.models.openai.upload_part import UploadPart
+from models.openai.complete_upload_request import CompleteUploadRequest
+from models.openai.create_upload_request import CreateUploadRequest
+from models.openai.upload import Upload
+from models.openai.upload_part import UploadPart
 
 
 router = APIRouter(prefix="/uploads", tags=["Uploads"])

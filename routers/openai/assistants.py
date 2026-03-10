@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.assistant_object import AssistantObject
-from server.models.openai.create_assistant_request import CreateAssistantRequest
-from server.models.openai.delete_assistant_response import DeleteAssistantResponse
-from server.models.openai.list_assistants_response import ListAssistantsResponse
-from server.models.openai.modify_assistant_request import ModifyAssistantRequest
+from models.openai.assistant_object import AssistantObject
+from models.openai.create_assistant_request import CreateAssistantRequest
+from models.openai.delete_assistant_response import DeleteAssistantResponse
+from models.openai.list_assistants_response import ListAssistantsResponse
+from models.openai.modify_assistant_request import ModifyAssistantRequest
 
 
 router = APIRouter(prefix="/assistants", tags=["Assistants"])

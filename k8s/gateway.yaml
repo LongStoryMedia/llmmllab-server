@@ -1,0 +1,85 @@
+# Gateway API resources for nginx-gateway
+# These replace the traditional Ingress resources
+# Note: HTTPRoutes must be in the same namespace as the Gateway (nginx-gateway)
+
+---
+# HTTPRoute for Server (HTTP API endpoints)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: llmmll-server-route
+  namespace: nginx-gateway
+spec:
+  parentRefs:
+    - name: lsm-gateway
+      namespace: nginx-gateway
+      sectionName: llmmll-server
+  hostnames:
+    - "api.llmmll.local"
+    - "llmmll.local"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+        - path:
+            type: PathPrefix
+            value: /v1
+        - path:
+            type: PathPrefix
+            value: /anthropic
+      backendRefs:
+        - name: llmmll-server
+          namespace: llmmll
+          port: 8001
+          weight: 1
+
+---
+# HTTPRoute for Composer (gRPC service)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: llmmll-composer-route
+  namespace: nginx-gateway
+spec:
+  parentRefs:
+    - name: lsm-gateway
+      namespace: nginx-gateway
+      sectionName: llmmll-composer
+  hostnames:
+    - "composer.llmmll.local"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: llmmll-composer
+          namespace: llmmll
+          port: 50051
+          weight: 1
+
+---
+# HTTPRoute for Runner (gRPC service)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: llmmll-runner-route
+  namespace: nginx-gateway
+spec:
+  parentRefs:
+    - name: lsm-gateway
+      namespace: nginx-gateway
+      sectionName: llmmll-runner
+  hostnames:
+    - "runner.llmmll.local"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: llmmll-runner
+          namespace: llmmll
+          port: 50052
+          weight: 1

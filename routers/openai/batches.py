@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.batch import Batch
-from server.models.openai.list_batches_response import ListBatchesResponse
+from models.openai.batch import Batch
+from models.openai.list_batches_response import ListBatchesResponse
 
 
 router = APIRouter(prefix="/batches", tags=["Batches"])

@@ -1,21 +1,21 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.deleted_role_assignment_resource import DeletedRoleAssignmentResource
-from server.models.openai.group_role_assignment import GroupRoleAssignment
-from server.models.openai.public_assign_organization_group_role_body import (
+from models.openai.deleted_role_assignment_resource import DeletedRoleAssignmentResource
+from models.openai.group_role_assignment import GroupRoleAssignment
+from models.openai.public_assign_organization_group_role_body import (
     PublicAssignOrganizationGroupRoleBody,
 )
-from server.models.openai.public_create_organization_role_body import (
+from models.openai.public_create_organization_role_body import (
     PublicCreateOrganizationRoleBody,
 )
-from server.models.openai.public_role_list_resource import PublicRoleListResource
-from server.models.openai.public_update_organization_role_body import (
+from models.openai.public_role_list_resource import PublicRoleListResource
+from models.openai.public_update_organization_role_body import (
     PublicUpdateOrganizationRoleBody,
 )
-from server.models.openai.role import Role
-from server.models.openai.role_deleted_resource import RoleDeletedResource
-from server.models.openai.role_list_resource import RoleListResource
-from server.models.openai.user_role_assignment import UserRoleAssignment
+from models.openai.role import Role
+from models.openai.role_deleted_resource import RoleDeletedResource
+from models.openai.role_list_resource import RoleListResource
+from models.openai.user_role_assignment import UserRoleAssignment
 
 
 router = APIRouter(prefix="/projects", tags=["Projects"])

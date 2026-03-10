@@ -8,7 +8,7 @@ import mimetypes
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from server.config import IMAGE_DIR
+from config import IMAGE_DIR
 
 router = APIRouter(prefix="/static", tags=["static"])
 

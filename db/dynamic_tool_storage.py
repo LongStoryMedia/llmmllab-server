@@ -6,11 +6,11 @@ from typing import List, Optional, Tuple
 import asyncpg
 import uuid
 import logging
-from ..models.dynamic_tool import DynamicTool
-from ..models.pagination import PaginationSchema
-from .db_utils import typed_pool
-from .serialization import deserialize_from_json, serialize_to_json
-from .memory_storage import MemoryStorage
+from models.dynamic_tool import DynamicTool
+from models.pagination import PaginationSchema
+from db.db_utils import typed_pool
+from db.serialization import deserialize_from_json, serialize_to_json
+from db.memory_storage import MemoryStorage
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +26,15 @@ class DynamicToolStorage:
         tool_data = dict(row)
 
         # Parse JSON fields using the centralized utility
-        tool_data["parameters"] = deserialize_from_json(tool_data.get("parameters"), default_factory=dict)
-        tool_data["args_schema"] = deserialize_from_json(tool_data.get("args_schema"), default_factory=dict)
-        tool_data["metadata"] = deserialize_from_json(tool_data.get("metadata"), default_factory=dict)
+        tool_data["parameters"] = deserialize_from_json(
+            tool_data.get("parameters"), default_factory=dict
+        )
+        tool_data["args_schema"] = deserialize_from_json(
+            tool_data.get("args_schema"), default_factory=dict
+        )
+        tool_data["metadata"] = deserialize_from_json(
+            tool_data.get("metadata"), default_factory=dict
+        )
 
         # Parse error handler fields (convert back from string to appropriate type)
         for field in ["handle_tool_error", "handle_validation_error"]:

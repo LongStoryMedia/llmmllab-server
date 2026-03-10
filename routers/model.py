@@ -11,16 +11,16 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-import server.config as config
-from server.middleware.auth import get_user_id, is_admin
-from server.config import logger
-from server.db import storage
+import config
+from middleware.auth import get_user_id, is_admin
+from config import logger
+from db import storage
 
-from server.models.model_profile import ModelProfile, ModelParameters
-from server.models.model import Model
-from server.models.model_task import ModelTask
-from server.models.model_details import ModelDetails
-from runner.utils.model_loader import ModelLoader
+from models.model_profile import ModelProfile, ModelParameters
+from models.model import Model
+from models.model_task import ModelTask
+from models.model_details import ModelDetails
+from utils.model_loader import ModelLoader
 import yaml
 
 
@@ -206,7 +206,6 @@ async def update_model_profile(
     except Exception as e:
         logger.error(f"Error updating model profile: {e}")
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}") from e
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}") from e
 
 
 @router.delete("/profiles/{profile_id}")
@@ -223,8 +222,10 @@ async def delete_model_profile(profile_id: str, request: Request):
         # Convert the profile ID string to UUID
         try:
             profile_uuid = uuid.UUID(profile_id)
-        except ValueError:
-            raise HTTPException(status_code=400, detail="Invalid profile ID format")
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400, detail="Invalid profile ID format"
+            ) from e
 
         # First check if profile exists and belongs to user
         profile = await storage.get_service(

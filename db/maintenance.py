@@ -9,7 +9,7 @@ import os
 
 from typing import Optional
 import asyncpg
-from ..utils.logging import llmmllogger
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="db.maintenance")
 
@@ -166,7 +166,9 @@ class DatabaseMaintenanceService:
                     )
                     logger.info("pgvector index maintenance completed")
                 except Exception as e:
-                    logger.warning(f"pgvector index maintenance skipped or failed: {str(e)}")
+                    logger.warning(
+                        f"pgvector index maintenance skipped or failed: {str(e)}"
+                    )
 
             self._last_run = datetime.datetime.now()
             logger.info(
@@ -289,21 +291,21 @@ class DatabaseMaintenanceService:
         """
         # List of all sequences to align: (table_name, sequence_name)
         sequences = [
-            ('messages', 'messages_id_seq'),
-            ('message_contents', 'message_contents_id_seq'),
-            ('tool_calls', 'tool_calls_id_seq'),
-            ('thoughts', 'thoughts_id_seq'),
-            ('todo_items', 'todo_items_id_seq'),
-            ('api_keys', 'api_keys_id_seq'),
-            ('summaries', 'summaries_id_seq'),
-            ('memories', 'memories_id_seq'),
-            ('images', 'images_id_seq'),
-            ('documents', 'documents_id_seq'),
-            ('dynamic_tools', 'dynamic_tools_id_seq'),
-            ('model_profiles', 'model_profiles_id_seq'),
-            ('search_topic_synthesis', 'search_topic_synthesis_id_seq'),
-            ('research_tasks', 'research_tasks_id_seq'),
-            ('research_subtasks', 'research_subtasks_id_seq'),
+            ("messages", "messages_id_seq"),
+            ("message_contents", "message_contents_id_seq"),
+            ("tool_calls", "tool_calls_id_seq"),
+            ("thoughts", "thoughts_id_seq"),
+            ("todo_items", "todo_items_id_seq"),
+            ("api_keys", "api_keys_id_seq"),
+            ("summaries", "summaries_id_seq"),
+            ("memories", "memories_id_seq"),
+            ("images", "images_id_seq"),
+            ("documents", "documents_id_seq"),
+            ("dynamic_tools", "dynamic_tools_id_seq"),
+            ("model_profiles", "model_profiles_id_seq"),
+            ("search_topic_synthesis", "search_topic_synthesis_id_seq"),
+            ("research_tasks", "research_tasks_id_seq"),
+            ("research_subtasks", "research_subtasks_id_seq"),
         ]
 
         for table_name, seq_name in sequences:
@@ -322,7 +324,9 @@ class DatabaseMaintenanceService:
                 )
                 logger.debug(f"Sequence {seq_name} aligned for table {table_name}")
             except Exception as e:
-                logger.warning(f"Could not align sequence {seq_name} for table {table_name}: {str(e)}")
+                logger.warning(
+                    f"Could not align sequence {seq_name} for table {table_name}: {str(e)}"
+                )
 
     async def _flush_pool_caches(self) -> None:
         """Cycle through pool connections and clear prepared statements/schema cache.

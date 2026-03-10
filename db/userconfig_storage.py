@@ -9,9 +9,9 @@ from collections import OrderedDict
 from typing import List, Optional, Dict
 import asyncpg
 
-from server.models.user_config import UserConfig
-from server.models.default_model_profiles import DEFAULT_MODEL_PROFILE_CONFIG
-from server.models.default_configs import (
+from models.user_config import UserConfig
+from models.default_model_profiles import DEFAULT_MODEL_PROFILE_CONFIG
+from models.default_configs import (
     DEFAULT_PREFERENCES_CONFIG,
     DEFAULT_MEMORY_CONFIG,
     DEFAULT_SUMMARIZATION_CONFIG,
@@ -27,11 +27,11 @@ from server.models.default_configs import (
 )
 
 
-from server.db.cache_storage import cache_storage
-from server.db.db_utils import typed_pool
-from server.db.connection_recovery import execute_with_recovery
-from server.utils.logging import llmmllogger
-from .serialization import serialize_to_json
+from db.cache_storage import cache_storage
+from db.db_utils import typed_pool
+from db.connection_recovery import execute_with_recovery
+from utils.logging import llmmllogger
+from db.serialization import serialize_to_json
 
 logger = llmmllogger.bind(component="userconfig_storage")
 
@@ -414,7 +414,7 @@ class UserConfigStorage:
                                     logger.warning(
                                         f"Failed to create UserConfig for user {user_id}: {e}"
                                     )
-                                    from server.routers.config import (
+                                    from routers.config import (
                                         create_default_config,
                                     )
 
@@ -426,14 +426,14 @@ class UserConfigStorage:
                                     f"Failed to process config for user {user_id}: {e}"
                                 )
                                 # Use empty config as fallback
-                                from server.routers.config import create_default_config
+                                from routers.config import create_default_config
 
                                 user_dict["config"] = create_default_config(
                                     user_id
                                 ).model_dump()
                         else:
                             # No config or empty config, use default
-                            from server.routers.config import create_default_config
+                            from routers.config import create_default_config
 
                             user_dict["config"] = create_default_config(
                                 user_id

@@ -39,10 +39,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from huggingface_hub import login
 
-from server.config import CONFIG_DIR, IMAGE_DIR
-from server.routers import (
+from config import CONFIG_DIR, IMAGE_DIR, AUTH_JWKS_URI, DB_CONNECTION_STRING
+from routers import (
     images,
     config,
     static,
@@ -58,24 +57,22 @@ from server.routers import (
     ollama,
     api_key,
 )
-from server.routers.openai import ROUTERS as OPENAI_ROUTERS
-from server.routers.anthropic import ROUTERS as ANTHROPIC_ROUTERS
-from server.routers.common import ROUTERS as COMMON_ROUTERS
-from server.middleware import (
+from routers.openai import ROUTERS as OPENAI_ROUTERS
+from routers.anthropic import ROUTERS as ANTHROPIC_ROUTERS
+from routers.common import ROUTERS as COMMON_ROUTERS
+from middleware import (
     AuthMiddleware,
     db_init_middleware,
     MessageValidationMiddleware,
 )
-from server.config import AUTH_JWKS_URI
-from server.cleanup_service import cleanup_service
-from server.db.maintenance import maintenance_service
-from server.utils.logging import llmmllogger
-from composer import shutdown_composer
-from composer.api.interface import ServerAdapter
-from runner import local_pipeline_cache
+from cleanup_service import cleanup_service
+from db import storage
+from db.maintenance import maintenance_service
+from utils.logging import llmmllogger
 
 
 logger = llmmllogger.bind(component="app")
+
 
 # # # Enable auth bypass for testing
 # os.environ["DISABLE_AUTH"] = "true"
@@ -86,26 +83,6 @@ logger = llmmllogger.bind(component="app")
 os.makedirs(IMAGE_DIR, exist_ok=True)
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
-# Get Hugging Face token from environment variable
-hf_token = os.environ.get("HF_TOKEN")
-if hf_token:
-    logger.info("Logging into Hugging Face with token from environment variable")
-    try:
-        login(token=hf_token)
-    except Exception as e:
-        logger.info(f"Failed to log in to Hugging Face: {e}")
-        logger.info("Continuing without Hugging Face authentication")
-else:
-    logger.info(
-        "Warning: No HF_TOKEN environment variable found. Some features may not work properly."
-    )
-    # Try login without token, will use cached credentials if available
-    try:
-        login(token=None)
-    except (ValueError, ConnectionError, TimeoutError) as e:
-        logger.info(f"Failed to log in to Hugging Face: {e}")
-        logger.info("Continuing without Hugging Face authentication")
-
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -115,11 +92,6 @@ async def lifespan(_: FastAPI):
 
     # Initialize database connection and schema if configured
     try:
-        from db import storage  # pylint: disable=import-outside-toplevel
-        from server.config import (  # pylint: disable=import-outside-toplevel
-            DB_CONNECTION_STRING,
-        )
-
         assert DB_CONNECTION_STRING is not None, "DB_CONNECTION_STRING is not set"
 
         await storage.initialize(DB_CONNECTION_STRING)
@@ -140,25 +112,6 @@ async def lifespan(_: FastAPI):
             logger.info("Database maintenance service stopped")
         except Exception as e:
             logger.info(f"Error stopping database maintenance service: {e}")
-
-        # Stop composer service
-        try:
-            await shutdown_composer()
-            logger.info("Composer service shutdown completed")
-        except Exception as e:
-            logger.info(f"Error stopping composer service: {e}")
-
-        # Attempt to gracefully stop and cleanup pipeline cache
-        try:
-            if local_pipeline_cache is not None:
-                logger.info("Stopping local pipeline cache and cleaning pipelines...")
-                try:
-                    local_pipeline_cache.stop()
-                    logger.info("Local pipeline cache stopped and cleaned")
-                except Exception as e:
-                    logger.info(f"Error stopping local pipeline cache: {e}")
-        except Exception:
-            pass
 
         cleanup_service.shutdown()
 

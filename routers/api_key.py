@@ -9,10 +9,10 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException, Request, status, Depends, Path
 from pydantic import BaseModel, Field
 
-from server.middleware.auth import get_user_id
-from server.db import storage
-from server.models import ApiKey, ApiKeyResponse, ApiKeyRequest
-from server.utils.logging import llmmllogger
+from middleware.auth import get_user_id
+from db import storage
+from models import ApiKey, ApiKeyResponse, ApiKeyRequest
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="api_key_router")
 router = APIRouter(prefix="/api-keys", tags=["api-keys"])

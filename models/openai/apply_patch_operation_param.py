@@ -4,11 +4,20 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .apply_patch_create_file_operation_param import ApplyPatchCreateFileOperationParam
-from .apply_patch_delete_file_operation_param import ApplyPatchDeleteFileOperationParam
-from .apply_patch_update_file_operation_param import ApplyPatchUpdateFileOperationParam
+from models.openai.apply_patch_create_file_operation_param import (
+    ApplyPatchCreateFileOperationParam,
+)
+from models.openai.apply_patch_delete_file_operation_param import (
+    ApplyPatchDeleteFileOperationParam,
+)
+from models.openai.apply_patch_update_file_operation_param import (
+    ApplyPatchUpdateFileOperationParam,
+)
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
 
-
-ApplyPatchOperationParam = Union[ApplyPatchCreateFileOperationParam, ApplyPatchDeleteFileOperationParam, ApplyPatchUpdateFileOperationParam]
+ApplyPatchOperationParam = Union[
+    ApplyPatchCreateFileOperationParam,
+    ApplyPatchDeleteFileOperationParam,
+    ApplyPatchUpdateFileOperationParam,
+]

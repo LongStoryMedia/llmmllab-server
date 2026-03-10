@@ -7,29 +7,29 @@ import json
 from datetime import datetime, timezone
 from typing import Callable, List, Optional, Dict, Any
 import asyncpg
-from ..models.message import Message
-from ..models.message_content import MessageContent
-from ..models.message_content_type import MessageContentType
-from ..models.tool_call import ToolCall
-from ..models.thought import Thought
-from ..models.resource_usage import ResourceUsage
-from ..models.intent_analysis import IntentAnalysis
-from ..models.workflow_type import WorkflowType
-from ..models.complexity_level import ComplexityLevel
-from ..models.required_capability import RequiredCapability
-from ..models.response_format import ResponseFormat
-from ..models.technical_domain import TechnicalDomain
-from ..models.computational_requirement import ComputationalRequirement
-from ..models.document import Document
-from .cache_storage import cache_storage
-from .db_utils import TypedConnection, typed_pool, get_recovery_manager
-from .serialization import deserialize_from_json
-from .thought_storage import ThoughtStorage
-from .tool_call_storage import ToolCallStorage
-from .message_content_storage import MessageContentStorage
-from .analysis_storage import AnalysisStorage
-from .document_storage import DocumentStorage
-from ..utils.logging import llmmllogger
+from models.message import Message
+from models.message_content import MessageContent
+from models.message_content_type import MessageContentType
+from models.tool_call import ToolCall
+from models.thought import Thought
+from models.resource_usage import ResourceUsage
+from models.intent_analysis import IntentAnalysis
+from models.workflow_type import WorkflowType
+from models.complexity_level import ComplexityLevel
+from models.required_capability import RequiredCapability
+from models.response_format import ResponseFormat
+from models.technical_domain import TechnicalDomain
+from models.computational_requirement import ComputationalRequirement
+from models.document import Document
+from db.cache_storage import cache_storage
+from db.db_utils import TypedConnection, typed_pool, get_recovery_manager
+from db.serialization import deserialize_from_json
+from db.thought_storage import ThoughtStorage
+from db.tool_call_storage import ToolCallStorage
+from db.message_content_storage import MessageContentStorage
+from db.analysis_storage import AnalysisStorage
+from db.document_storage import DocumentStorage
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="message_storage")
 
@@ -387,8 +387,12 @@ class MessageStorage:
         """
         # Parse JSON fields from strings to dicts using deserialize_from_json
         args = deserialize_from_json(row.get("args", "{}"), default_factory=dict)
-        result_data = deserialize_from_json(row.get("result_data", "{}"), default_factory=dict)
-        resource_usage_data = deserialize_from_json(row.get("resource_usage", "{}"), default_factory=dict)
+        result_data = deserialize_from_json(
+            row.get("result_data", "{}"), default_factory=dict
+        )
+        resource_usage_data = deserialize_from_json(
+            row.get("resource_usage", "{}"), default_factory=dict
+        )
 
         created_at = row["created_at"]
         if isinstance(created_at, str):
@@ -430,8 +434,7 @@ class MessageStorage:
         """
         # Parse required_capabilities from JSONB to List[RequiredCapability]
         required_capabilities_data = deserialize_from_json(
-            row.get("required_capabilities", []),
-            default_factory=list
+            row.get("required_capabilities", []), default_factory=list
         )
 
         required_capabilities = []
@@ -458,7 +461,9 @@ class MessageStorage:
             # Already an enum object
             computational_requirements = comp_req_raw
         elif isinstance(comp_req_raw, dict):
-            val = comp_req_raw.get("computational_requirements") or comp_req_raw.get("value")
+            val = comp_req_raw.get("computational_requirements") or comp_req_raw.get(
+                "value"
+            )
             if isinstance(val, str):
                 try:
                     computational_requirements = ComputationalRequirement(val)
@@ -701,7 +706,7 @@ class MessageStorage:
 
         Args:
             conversation_id: The conversation ID
-            from_timestamp: Delete messages created at or after this timestamp
+            from _timestamp: Delete messages created at or after this timestamp
 
         Returns:
             Number of messages deleted

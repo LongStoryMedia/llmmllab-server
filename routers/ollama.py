@@ -15,19 +15,20 @@ from fastapi import APIRouter, HTTPException, Request, Depends, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from server.middleware.auth import get_auth_middleware
-from server.db import storage
-from server.models import (
+from middleware.auth import get_auth_middleware
+from models import (
     Message,
     MessageRole,
     MessageContent,
     MessageContentType,
     Conversation,
 )
-from server.utils.logging import llmmllogger
-import composer
-from runner.utils.model_loader import ModelLoader
-from server.utils.message_conversion import extract_text_from_message  # Import logging utility
+from utils.logging import llmmllogger
+from utils.message_conversion import (
+    extract_text_from_message,
+)  # Import logging utility
+from utils.model_loader import ModelLoader
+from grpc_client import get_composer_client
 
 logger = llmmllogger.bind(component="ollama_router")
 router = APIRouter(tags=["ollama"])
@@ -324,15 +325,31 @@ async def stream_composer_to_ollama_chat(
     messages: List[OllamaMessage],
 ) -> AsyncIterator[str]:
     """Stream composer events in Ollama chat format"""
-    builder = await composer.get_graph_builder(composer.WorkFlowType.IDE, LOCAL_USER_ID)
-    workflow = await composer.compose_workflow(LOCAL_USER_ID, builder, None)
-    initial_state = await builder.create_initial_state(
-        LOCAL_USER_ID,
-        0,
-        convert_ollama_to_internal_messages(messages, conversation_id=0),
+    # Get composer client and compose workflow via gRPC
+    client = get_composer_client()
+
+    # Create initial state via gRPC
+    initial_state = await client.create_initial_state(
+        user_id=LOCAL_USER_ID,
+        conversation_id=0,
+        workflow_type="ide",
     )
 
-    async for event in composer.execute_workflow(initial_state, workflow):
+    # Compose workflow via gRPC
+    compose_result = await client.compose_workflow(
+        user_id=LOCAL_USER_ID,
+        workflow_type="ide",
+        model_name=None,
+        client_tools=None,
+        tool_choice=None,
+    )
+    workflow_id = compose_result["workflow_id"]
+
+    async for event in client.execute_workflow(
+        workflow_id=workflow_id,
+        initial_state=initial_state,
+        stream_events=True,
+    ):
         print(
             extract_text_from_message(event.message) if event.message else "",
             flush=True,

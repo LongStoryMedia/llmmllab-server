@@ -7,9 +7,9 @@ import asyncpg
 import json
 from typing import List, Optional
 from datetime import datetime
-from ..models.intent_analysis import IntentAnalysis
-from .db_utils import typed_pool, TypedConnection
-from ..utils.logging import llmmllogger
+from models.intent_analysis import IntentAnalysis
+from db.db_utils import typed_pool, TypedConnection
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="analysis_storage")
 
@@ -48,7 +48,9 @@ class AnalysisStorage:
             # Use provided connection or acquire a new one
             if conn is None:
                 async with self.typed_pool.acquire() as connection:
-                    return await self._add_analysis(intent_analysis, connection, created_at)
+                    return await self._add_analysis(
+                        intent_analysis, connection, created_at
+                    )
             else:
                 return await self._add_analysis(intent_analysis, conn, created_at)
 
@@ -57,7 +59,10 @@ class AnalysisStorage:
             return None
 
     async def _add_analysis(
-        self, intent_analysis: IntentAnalysis, conn: TypedConnection, created_at: Optional[datetime] = None
+        self,
+        intent_analysis: IntentAnalysis,
+        conn: TypedConnection,
+        created_at: Optional[datetime] = None,
     ) -> Optional[int]:
         """
         Internal method to add analysis using a specific connection.
@@ -80,8 +85,16 @@ class AnalysisStorage:
             intent_analysis.domain_specificity,  # $5
             intent_analysis.reusability_potential,  # $6
             intent_analysis.confidence,  # $7
-            intent_analysis.response_format.value if intent_analysis.response_format else None,  # $8
-            intent_analysis.technical_domain.value if intent_analysis.technical_domain else None,  # $9
+            (
+                intent_analysis.response_format.value
+                if intent_analysis.response_format
+                else None
+            ),  # $8
+            (
+                intent_analysis.technical_domain.value
+                if intent_analysis.technical_domain
+                else None
+            ),  # $9
             intent_analysis.requires_tools,  # $10
             intent_analysis.requires_custom_tools,  # $11
             intent_analysis.tool_complexity_score,  # $12
@@ -154,12 +167,18 @@ class AnalysisStorage:
                 analysis = {
                     "workflow_type": ia.workflow_type.value,
                     "complexity_level": ia.complexity_level.value,
-                    "required_capabilities": [cap.value for cap in ia.required_capabilities],
+                    "required_capabilities": [
+                        cap.value for cap in ia.required_capabilities
+                    ],
                     "domain_specificity": ia.domain_specificity,
                     "reusability_potential": ia.reusability_potential,
                     "confidence": ia.confidence,
-                    "response_format": ia.response_format.value if ia.response_format else None,
-                    "technical_domain": ia.technical_domain.value if ia.technical_domain else None,
+                    "response_format": (
+                        ia.response_format.value if ia.response_format else None
+                    ),
+                    "technical_domain": (
+                        ia.technical_domain.value if ia.technical_domain else None
+                    ),
                     "requires_tools": ia.requires_tools,
                     "requires_custom_tools": ia.requires_custom_tools,
                     "tool_complexity_score": ia.tool_complexity_score,

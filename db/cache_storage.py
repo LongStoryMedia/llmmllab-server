@@ -27,11 +27,11 @@ import json
 from typing import Optional, List, Any, Type, Callable
 from uuid import UUID
 import redis
-from server.models.message import Message
-from server.models.summary import Summary
-from server.models.conversation import Conversation
-from server.models.model_profile import ModelProfile
-from server.models.user_config import UserConfig
+from models.message import Message
+from models.summary import Summary
+from models.conversation import Conversation
+from models.model_profile import ModelProfile
+from models.user_config import UserConfig
 
 # Set up logger
 logger = logging.getLogger(__name__)

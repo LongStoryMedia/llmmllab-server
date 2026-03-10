@@ -13,7 +13,7 @@ from langchain_core.messages import (
     ToolMessage,
     ToolCall as LangChainToolCall,
 )
-from server.models import ToolCall
+from models import ToolCall
 
 
 class ToolCallCapableMessage(Protocol):

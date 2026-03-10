@@ -5,8 +5,8 @@ Database initialization utilities.
 import asyncio
 from typing import Any, List, Tuple
 
-from ..utils.logging import llmmllogger
-from .queries import get_query
+from utils.logging import llmmllogger
+from db.queries import get_query
 
 logger = llmmllogger.bind(component="db_init")
 
@@ -237,9 +237,13 @@ async def initialize_database(connection_pool: Any) -> bool:
                 zip(results, initialization_steps), 1
             ):
                 if success:
-                    logger.info(f"✅ Step {idx}/{step_count}: {step_description} completed successfully")
+                    logger.info(
+                        f"✅ Step {idx}/{step_count}: {step_description} completed successfully"
+                    )
                 else:
-                    logger.warning(f"⚠️ Step {idx}/{step_count}: {step_description} completed with warnings")
+                    logger.warning(
+                        f"⚠️ Step {idx}/{step_count}: {step_description} completed with warnings"
+                    )
 
             # Return success
             logger.info("Database schema initialized successfully.")

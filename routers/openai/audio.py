@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_speech_request import CreateSpeechRequest
-from server.models.openai.update_voice_consent_request import UpdateVoiceConsentRequest
-from server.models.openai.voice_consent_deleted_resource import VoiceConsentDeletedResource
-from server.models.openai.voice_consent_list_resource import VoiceConsentListResource
-from server.models.openai.voice_consent_resource import VoiceConsentResource
-from server.models.openai.voice_resource import VoiceResource
+from models.openai.create_speech_request import CreateSpeechRequest
+from models.openai.update_voice_consent_request import UpdateVoiceConsentRequest
+from models.openai.voice_consent_deleted_resource import VoiceConsentDeletedResource
+from models.openai.voice_consent_list_resource import VoiceConsentListResource
+from models.openai.voice_consent_resource import VoiceConsentResource
+from models.openai.voice_resource import VoiceResource
 
 
 router = APIRouter(prefix="/audio", tags=["Audio"])

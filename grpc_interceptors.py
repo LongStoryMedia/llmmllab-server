@@ -16,13 +16,14 @@ from dataclasses import dataclass
 
 import grpc
 from grpc import StatusCode
+
 # grpc.aio.ClientCallDetails.metadata is typed as _Metadata which is an internal type
 # It accepts either None or a Mapping[str, str] or Sequence[Tuple[str, str]]
 # We use type: ignore for metadata type issues as they are internal to grpc
 from grpc.aio import ClientCallDetails
 
-from server.middleware.auth import TokenValidationResult, get_auth_middleware
-from server import config
+from middleware.auth import TokenValidationResult, get_auth_middleware
+import config
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +37,11 @@ BEARER_PREFIX_LENGTH = len(BEARER_PREFIX)
 # Authentication Interceptor
 # =============================================================================
 
+
 @dataclass
 class AuthContext:
     """Authentication context extracted from a request."""
+
     token: Optional[str] = None
     valid: bool = False
     claims: Optional[dict] = None
@@ -50,7 +53,9 @@ class AuthenticationUnaryUnaryServerInterceptor:
     """Server interceptor that validates authentication tokens on unary-unary calls."""
 
     def __init__(self, jwks_uri: Optional[str] = None):
-        self.jwks_uri = jwks_uri or getattr(config, "AUTH_JWKS_URI", "https://auth.example.com/.well-known/jwks.json")
+        self.jwks_uri = jwks_uri or getattr(
+            config, "AUTH_JWKS_URI", "https://auth.example.com/.well-known/jwks.json"
+        )
         self._auth_middleware = None
 
     @property
@@ -101,8 +106,10 @@ class AuthenticationUnaryUnaryServerInterceptor:
             token = token[BEARER_PREFIX_LENGTH:]
 
         try:
-            # Use the existing JWTValidator from server.middleware.auth
-            result: TokenValidationResult = await self.auth_middleware.validator.validate_token(token)
+            # Use the existing JWTValidator from middleware.auth
+            result: TokenValidationResult = (
+                await self.auth_middleware.validator.validate_token(token)
+            )
 
             return AuthContext(
                 token=token,
@@ -123,7 +130,9 @@ class AuthenticationUnaryStreamServerInterceptor:
     """Server interceptor that validates authentication tokens on unary-stream calls."""
 
     def __init__(self, jwks_uri: Optional[str] = None):
-        self.jwks_uri = jwks_uri or getattr(config, "AUTH_JWKS_URI", "https://auth.example.com/.well-known/jwks.json")
+        self.jwks_uri = jwks_uri or getattr(
+            config, "AUTH_JWKS_URI", "https://auth.example.com/.well-known/jwks.json"
+        )
         self._auth_middleware = None
 
     @property
@@ -171,8 +180,10 @@ class AuthenticationUnaryStreamServerInterceptor:
             token = token[BEARER_PREFIX_LENGTH:]
 
         try:
-            # Use the existing JWTValidator from server.middleware.auth
-            result: TokenValidationResult = await self.auth_middleware.validator.validate_token(token)
+            # Use the existing JWTValidator from middleware.auth
+            result: TokenValidationResult = (
+                await self.auth_middleware.validator.validate_token(token)
+            )
 
             return AuthContext(
                 token=token,
@@ -191,6 +202,7 @@ class AuthenticationUnaryStreamServerInterceptor:
 # =============================================================================
 # Logging Interceptor
 # =============================================================================
+
 
 class LoggingUnaryUnaryServerInterceptor:
     """Server interceptor that logs unary-unary calls."""
@@ -249,6 +261,7 @@ class LoggingUnaryStreamServerInterceptor:
 # Metrics Interceptor
 # =============================================================================
 
+
 class MetricsUnaryUnaryServerInterceptor:
     """Server interceptor that collects metrics for unary-unary calls."""
 
@@ -302,6 +315,7 @@ class MetricsUnaryUnaryServerInterceptor:
 # Compression Interceptor
 # =============================================================================
 
+
 class CompressionClientInterceptor:
     """Client interceptor that enables compression for large messages."""
 
@@ -324,7 +338,9 @@ class CompressionClientInterceptor:
         # Store compression algorithm for use at call time
         # In gRPC, compression is set per-call using the compression keyword argument
         # This interceptor enables compression by returning a wrapper that applies it
-        return _CompressedUnaryUnaryCall(continuation, client_call_details, request, self._compression)
+        return _CompressedUnaryUnaryCall(
+            continuation, client_call_details, request, self._compression
+        )
 
     def intercept_unary_stream(
         self,
@@ -333,7 +349,9 @@ class CompressionClientInterceptor:
         request: Any,
     ) -> Any:
         """Intercept a unary-stream call and enable compression."""
-        return _CompressedUnaryStreamCall(continuation, client_call_details, request, self._compression)
+        return _CompressedUnaryStreamCall(
+            continuation, client_call_details, request, self._compression
+        )
 
 
 class CompressionStreamClientInterceptor:
@@ -349,7 +367,9 @@ class CompressionStreamClientInterceptor:
         request_iterator: Any,
     ) -> Any:
         """Intercept a stream-unary call and enable compression."""
-        return _CompressedStreamUnaryCall(continuation, client_call_details, request_iterator, self._compression)
+        return _CompressedStreamUnaryCall(
+            continuation, client_call_details, request_iterator, self._compression
+        )
 
     def intercept_stream_stream(
         self,
@@ -358,12 +378,15 @@ class CompressionStreamClientInterceptor:
         request_iterator: Any,
     ) -> Any:
         """Intercept a stream-stream call and enable compression."""
-        return _CompressedStreamStreamCall(continuation, client_call_details, request_iterator, self._compression)
+        return _CompressedStreamStreamCall(
+            continuation, client_call_details, request_iterator, self._compression
+        )
 
 
 # =============================================================================
 # Compressed Call Wrappers
 # =============================================================================
+
 
 class _CompressedUnaryUnaryCall:
     """Wrapper for unary-unary calls with compression enabled."""
@@ -486,7 +509,10 @@ class _CompressedStreamStreamCall:
 # Utility Functions
 # =============================================================================
 
-def create_auth_token_provider(token: Optional[str] = None) -> Callable[[], Optional[str]]:
+
+def create_auth_token_provider(
+    token: Optional[str] = None,
+) -> Callable[[], Optional[str]]:
     """
     Create a token provider function for authentication client interceptor.
 
@@ -496,8 +522,10 @@ def create_auth_token_provider(token: Optional[str] = None) -> Callable[[], Opti
     Returns:
         A callable that returns the auth token
     """
+
     def provider() -> Optional[str]:
         return token
+
     return provider
 
 
@@ -531,7 +559,9 @@ def get_client_interceptors(token: Optional[str] = None) -> list:
 
     # Add authentication interceptor if token provided
     if token:
-        interceptors.append(AuthenticationClientInterceptor(create_auth_token_provider(token)))
+        interceptors.append(
+            AuthenticationClientInterceptor(create_auth_token_provider(token))
+        )
 
     # Add compression interceptor
     interceptors.append(CompressionClientInterceptor())
@@ -539,7 +569,9 @@ def get_client_interceptors(token: Optional[str] = None) -> list:
     return interceptors
 
 
-def inject_auth_context_to_metadata(auth_context: AuthContext, context: grpc.ServicerContext) -> None:
+def inject_auth_context_to_metadata(
+    auth_context: AuthContext, context: grpc.ServicerContext
+) -> None:
     """
     Inject authentication context into servicer context metadata.
 
@@ -556,6 +588,7 @@ def inject_auth_context_to_metadata(auth_context: AuthContext, context: grpc.Ser
 # =============================================================================
 # Client Authentication Interceptor
 # =============================================================================
+
 
 class AuthenticationClientInterceptor:
     """Client interceptor that adds authentication token to outgoing requests."""
@@ -581,7 +614,9 @@ class AuthenticationClientInterceptor:
         if token:
             # Add token to metadata (gRPC metadata requires bytes values)
             metadata = list(client_call_details.metadata or [])
-            metadata.append((AUTHORIZATION_HEADER, f"{BEARER_PREFIX}{token}".encode("utf-8")))
+            metadata.append(
+                (AUTHORIZATION_HEADER, f"{BEARER_PREFIX}{token}".encode("utf-8"))
+            )
 
             # Create new ClientCallDetails with updated metadata
             new_details = ClientCallDetails(
@@ -614,7 +649,9 @@ class AuthenticationStreamClientInterceptor:
 
         if token:
             metadata = list(client_call_details.metadata or [])
-            metadata.append((AUTHORIZATION_HEADER, f"{BEARER_PREFIX}{token}".encode("utf-8")))
+            metadata.append(
+                (AUTHORIZATION_HEADER, f"{BEARER_PREFIX}{token}".encode("utf-8"))
+            )
 
             new_details = ClientCallDetails(
                 method=client_call_details.method,

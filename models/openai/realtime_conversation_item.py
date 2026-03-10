@@ -4,24 +4,42 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .mcp_list_tools_tool import MCPListToolsTool
-from .realtime_conversation_item_function_call import RealtimeConversationItemFunctionCall
-from .realtime_conversation_item_function_call_output import RealtimeConversationItemFunctionCallOutput
-from .realtime_conversation_item_message_assistant import RealtimeConversationItemMessageAssistant
-from .realtime_conversation_item_message_assistant import ContentItem
-from .realtime_conversation_item_message_system import RealtimeConversationItemMessageSystem
-from .realtime_conversation_item_message_system import ContentItem
-from .realtime_conversation_item_message_user import RealtimeConversationItemMessageUser
-from .realtime_conversation_item_message_user import ContentItem
-from .realtime_mcp_approval_request import RealtimeMCPApprovalRequest
-from .realtime_mcp_approval_response import RealtimeMCPApprovalResponse
-from .realtime_mcp_list_tools import RealtimeMCPListTools
-from .realtime_mcp_protocol_error import RealtimeMCPProtocolError
-from .realtime_mcp_tool_call import RealtimeMCPToolCall
-from .realtime_mcp_tool_execution_error import RealtimeMCPToolExecutionError
-from .realtime_mcphttp_error import RealtimeMCPHTTPError
+from models.openai.mcp_list_tools_tool import MCPListToolsTool
+from models.openai.realtime_conversation_item_function_call import (
+    RealtimeConversationItemFunctionCall,
+)
+from models.openai.realtime_conversation_item_function_call_output import (
+    RealtimeConversationItemFunctionCallOutput,
+)
+from models.openai.realtime_conversation_item_message_assistant import (
+    RealtimeConversationItemMessageAssistant,
+)
+from models.openai.realtime_conversation_item_message_system import (
+    RealtimeConversationItemMessageSystem,
+)
+from models.openai.realtime_conversation_item_message_user import (
+    RealtimeConversationItemMessageUser,
+)
+from models.openai.realtime_mcp_approval_request import RealtimeMCPApprovalRequest
+from models.openai.realtime_mcp_approval_response import RealtimeMCPApprovalResponse
+from models.openai.realtime_mcp_list_tools import RealtimeMCPListTools
+from models.openai.realtime_mcp_protocol_error import RealtimeMCPProtocolError
+from models.openai.realtime_mcp_tool_call import RealtimeMCPToolCall
+from models.openai.realtime_mcp_tool_execution_error import (
+    RealtimeMCPToolExecutionError,
+)
+from models.openai.realtime_mcphttp_error import RealtimeMCPHTTPError
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
 
-
-RealtimeConversationItem = Union[RealtimeConversationItemMessageSystem, RealtimeConversationItemMessageUser, RealtimeConversationItemMessageAssistant, RealtimeConversationItemFunctionCall, RealtimeConversationItemFunctionCallOutput, RealtimeMCPApprovalResponse, RealtimeMCPListTools, RealtimeMCPToolCall, RealtimeMCPApprovalRequest]
+RealtimeConversationItem = Union[
+    RealtimeConversationItemMessageSystem,
+    RealtimeConversationItemMessageUser,
+    RealtimeConversationItemMessageAssistant,
+    RealtimeConversationItemFunctionCall,
+    RealtimeConversationItemFunctionCallOutput,
+    RealtimeMCPApprovalResponse,
+    RealtimeMCPListTools,
+    RealtimeMCPToolCall,
+    RealtimeMCPApprovalRequest,
+]

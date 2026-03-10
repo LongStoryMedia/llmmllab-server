@@ -1,0 +1,36 @@
+[MASTER]
+init-hook='import sys; sys.path.insert(0, "gen/python")'
+max-line-length=120
+jobs=4
+
+[MESSAGES CONTROL]
+# Disable messages that are not relevant or too strict
+disable=
+    C,  # Convention
+    R,  # Refactor
+    W0622,  # Redefining built-in
+    W0611,  # Unused import
+    W0613,  # Unused argument
+    W0718,  # Too broad exception
+    W0511,  # Todo marker
+    W0640,  # Cell variable defined in loop
+    W0212,  # Access to protected member
+    W1203,  # logging-fstring-interpolation
+    W0107,  # Unnecessary pass statement
+    W0135,  # Context manager generator missing cleanup
+    W0602,  # Using global without assignment
+    W0603,  # Using global statement
+    W0621,  # Redefining name from outer scope
+    W0612,  # Unused variable
+    no-name-in-module,  # Cannot find generated protobuf members
+    no-member,  # Cannot find generated protobuf members
+    import-error,  # Cannot find generated protobuf modules
+    W0404,  # Reimport
+    E0102,  # Function already defined (generated code issue)
+
+[TYPECHECK]
+generated-members=RUNTIME_TYPE_CHECKS,protobuf_*,common_dot_timestamp__pb2,common_dot_version__pb2,google_dot_api_dot_annotations__pb2
+
+[FORMAT]
+max-line-length=120
+max-module-lines=1000

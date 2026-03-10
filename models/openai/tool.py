@@ -4,49 +4,63 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .apply_patch_tool_param import ApplyPatchToolParam
-from .approximate_location import ApproximateLocation
-from .code_interpreter_container_auto import CodeInterpreterContainerAuto
-from .code_interpreter_tool import CodeInterpreterTool
-from .comparison_filter import ComparisonFilter
-from .comparison_filter_value_items import ComparisonFilterValueItems
-from .compound_filter import CompoundFilter
-from .computer_environment import ComputerEnvironment
-from .computer_use_preview_tool import ComputerUsePreviewTool
-from .container_memory_limit import ContainerMemoryLimit
-from .custom_grammar_format_param import CustomGrammarFormatParam
-from .custom_text_format_param import CustomTextFormatParam
-from .custom_tool_param import CustomToolParam
-from .file_search_tool import FileSearchTool
-from .filters import Filters
-from .function_shell_tool_param import FunctionShellToolParam
-from .function_tool import FunctionTool
-from .grammar_syntax1 import GrammarSyntax1
-from .hybrid_search_options import HybridSearchOptions
-from .image_gen_tool import ImageGenTool
-from .image_gen_tool import InputImageMask
-from .input_fidelity import InputFidelity
-from .local_shell_tool_param import LocalShellToolParam
-from .mcp_tool import MCPTool
-from .mcp_tool_filter import MCPToolFilter
-from .ranker_version_type import RankerVersionType
-from .ranking_options import RankingOptions
-from .search_context_size import SearchContextSize
-from .web_search_approximate_location import WebSearchApproximateLocation
-from .web_search_preview_tool import WebSearchPreviewTool
-from .web_search_tool import WebSearchTool
+from models.openai.apply_patch_tool_param import ApplyPatchToolParam
+from models.openai.approximate_location import ApproximateLocation
+from models.openai.code_interpreter_container_auto import CodeInterpreterContainerAuto
+from models.openai.code_interpreter_tool import CodeInterpreterTool
+from models.openai.comparison_filter import ComparisonFilter
+from models.openai.comparison_filter_value_items import ComparisonFilterValueItems
+from models.openai.compound_filter import CompoundFilter
+from models.openai.computer_environment import ComputerEnvironment
+from models.openai.computer_use_preview_tool import ComputerUsePreviewTool
+from models.openai.container_memory_limit import ContainerMemoryLimit
+from models.openai.custom_grammar_format_param import CustomGrammarFormatParam
+from models.openai.custom_text_format_param import CustomTextFormatParam
+from models.openai.custom_tool_param import CustomToolParam
+from models.openai.file_search_tool import FileSearchTool
+from models.openai.filters import Filters
+from models.openai.function_shell_tool_param import FunctionShellToolParam
+from models.openai.function_tool import FunctionTool
+from models.openai.grammar_syntax1 import GrammarSyntax1
+from models.openai.hybrid_search_options import HybridSearchOptions
+from models.openai.image_gen_tool import ImageGenTool
+from models.openai.image_gen_tool import InputImageMask
+from models.openai.input_fidelity import InputFidelity
+from models.openai.local_shell_tool_param import LocalShellToolParam
+from models.openai.mcp_tool import MCPTool
+from models.openai.mcp_tool_filter import MCPToolFilter
+from models.openai.ranker_version_type import RankerVersionType
+from models.openai.ranking_options import RankingOptions
+from models.openai.search_context_size import SearchContextSize
+from models.openai.web_search_approximate_location import WebSearchApproximateLocation
+from models.openai.web_search_preview_tool import WebSearchPreviewTool
+from models.openai.web_search_tool import WebSearchTool
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
-
 
 
 class MCPToolApprovalFilter(BaseModel):
     """Specify which of the MCP server's tools require approval. Can be
-`always`, `never`, or a filter object associated with tools
-that require approval.
-"""
+    `always`, `never`, or a filter object associated with tools
+    that require approval.
+    """
+
     always: Annotated[Optional[MCPToolFilter], Field(default=None)] = None
     never: Annotated[Optional[MCPToolFilter], Field(default=None)] = None
 
     model_config = ConfigDict(extra="ignore")
 
-Tool = Union[FunctionTool, FileSearchTool, ComputerUsePreviewTool, WebSearchTool, MCPTool, CodeInterpreterTool, ImageGenTool, LocalShellToolParam, FunctionShellToolParam, CustomToolParam, WebSearchPreviewTool, ApplyPatchToolParam]
+
+Tool = Union[
+    FunctionTool,
+    FileSearchTool,
+    ComputerUsePreviewTool,
+    WebSearchTool,
+    MCPTool,
+    CodeInterpreterTool,
+    ImageGenTool,
+    LocalShellToolParam,
+    FunctionShellToolParam,
+    CustomToolParam,
+    WebSearchPreviewTool,
+    ApplyPatchToolParam,
+]

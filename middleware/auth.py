@@ -4,12 +4,12 @@ Example of how to use this authentication module with FastAPI:
 ```python
 from fastapi import FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
-from . import config
+from server import config
 
 app = FastAPI()
 
 # Get the singleton auth middleware instance
-from .auth import get_auth_middleware
+from middleware.auth import get_auth_middleware
 auth_middleware = get_auth_middleware()
 
 @app.middleware("http")
@@ -23,10 +23,10 @@ async def auth_middleware_handler(request: Request, call_next):
         await auth_middleware.authenticate(request)
         response = await call_next(request)
         return response
-    except HTTPException as e:
+    except HTTPException as exc:
         return JSONResponse(
-            status_code=e.status_code,
-            content={"error": e.detail}
+            status_code=exc.status_code,
+            content={"error": exc.detail}
         )
 
 @app.get("/protected")
@@ -62,8 +62,8 @@ from jwt.api_jwk import PyJWK  # Used for JWT key processing
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPBearer
 
-from server import config  # Import config for auth settings
-from server.utils.logging import llmmllogger
+import config  # Import config for auth settings
+from utils.logging import llmmllogger
 
 
 # Custom context keys (equivalent to Go's contextKey type)
@@ -232,7 +232,7 @@ class JWTValidator:
             return TokenValidationResult(
                 user_id=user_id, claims=payload, is_admin=user_is_admin
             )
-        except HTTPException:
+        except HTTPException as exc:
             # Re-raise HTTP exceptions as is
             raise
         except Exception as e:
@@ -389,7 +389,7 @@ class AuthMiddleware:
                         raise HTTPException(
                             status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Invalid or expired API key",
-                        )
+                        ) from None
 
                     # Generate request ID
                     request_id = str(uuid.uuid4())
@@ -453,7 +453,7 @@ class AuthMiddleware:
                 )
                 return result
 
-            except HTTPException:
+            except HTTPException as exc:
                 raise
             except Exception as e:
                 self.logger.error(f"API key validation failed: {e}")

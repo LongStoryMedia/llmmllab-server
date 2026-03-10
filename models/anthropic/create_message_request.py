@@ -6,12 +6,12 @@ from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
-from .input_message import InputMessage
-from .system_prompt import SystemPrompt
-from .tool import Tool
-from .tool_choice import ToolChoice
-from .thinking_config import ThinkingConfig
-from .metadata import Metadata
+from models.anthropic.input_message import InputMessage
+from models.anthropic.system_prompt import SystemPrompt
+from models.anthropic.tool import Tool
+from models.anthropic.tool_choice import ToolChoice
+from models.anthropic.thinking_config import ThinkingConfig
+from models.anthropic.metadata import Metadata
 
 
 class CreateMessageRequest(BaseModel):

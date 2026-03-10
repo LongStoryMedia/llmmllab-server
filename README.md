@@ -48,9 +48,57 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
 
-# Install generated gRPC code (for local development)
-pip install -e gen/python
+### Code Generation
+
+The server uses gRPC for inter-service communication and Pydantic models generated from YAML schemas.
+
+**Generate gRPC code from proto files:**
+```bash
+make proto
+```
+
+This generates Python gRPC code from the proto files in `../proto/`.
+
+**Generate models from YAML schemas:**
+```bash
+# From the llmmllab-schemas repository
+make gen-python
+make gen-typescript
+```
+
+This generates Python Pydantic models and TypeScript types from the YAML schemas.
+
+### Local Development Database
+
+For local development, you can run PostgreSQL using Docker Compose:
+
+```bash
+# Start PostgreSQL
+make postgres
+
+# Stop PostgreSQL
+make postgres-stop
+```
+
+The PostgreSQL container is configured with:
+- User: `lsm`
+- Password: `postgres` (default, configurable via `POSTGRES_PASSWORD` env var)
+- Database: `llmmll`
+- Port: `5432` (default)
+
+**Environment variables for local PostgreSQL:**
+- `POSTGRES_USER` - Database user (default: `lsm`)
+- `POSTGRES_PASSWORD` - Database password (default: `postgres`)
+- `POSTGRES_DB` - Database name (default: `llmmll`)
+- `POSTGRES_PORT` - Port to expose (default: `5432`)
+
+When running locally, configure your server with:
+```bash
+DB_CONNECTION_STRING=postgresql://lsm:postgres@localhost:5432/llmmll
+REDIS_HOST=localhost
+REDIS_PORT=6379
 ```
 
 ## Usage
@@ -75,8 +123,7 @@ make lint
 
 ```bash
 # Build Docker image
-./build-image.sh multi-arch
-./build-image.sh lsnode-3
+make build-image
 
 # Deploy to k8s
 make deploy

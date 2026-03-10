@@ -1,17 +1,17 @@
 from fastapi import APIRouter, HTTPException, Request
 from typing import Optional, Union
-from server.middleware.auth import get_user_id
-from server.models.openai.delete_file_response import DeleteFileResponse
-from server.models.openai.list_files_response import (
+from middleware.auth import get_user_id
+from models.openai.delete_file_response import DeleteFileResponse
+from models.openai.list_files_response import (
     ListFilesResponse as OpenAIListFilesResponse,
 )
-from server.models.openai.open_ai_file import OpenAIFile
-from server.models.anthropic.delete_response import DeleteResponse
-from server.models.anthropic.file_list_response import (
+from models.openai.open_ai_file import OpenAIFile
+from models.anthropic.delete_response import DeleteResponse
+from models.anthropic.file_list_response import (
     FileListResponse as AnthropicFileListResponse,
 )
-from server.models.anthropic.file_metadata import FileMetadata
-from server.utils.logging import llmmllogger
+from models.anthropic.file_metadata import FileMetadata
+from utils.logging import llmmllogger
 
 
 logger = llmmllogger.bind(component="common_files_router")

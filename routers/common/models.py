@@ -2,18 +2,18 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Request
 from typing import Optional, Union
-from runner.utils.model_loader import ModelLoader
-from server.middleware.auth import get_user_id
-from server.models.openai import DeleteModelResponse, ListModelsResponse, Model as OpenAIModel
-from server.models.anthropic import (
+from utils.model_loader import ModelLoader
+from middleware.auth import get_user_id
+from models.openai import DeleteModelResponse, ListModelsResponse, Model as OpenAIModel
+from models.anthropic import (
     ModelListResponse as AnthropicModelListResponse,
     Model as AnthropicModel,
 )
-from server.models.model import Model
-from server.models.model_task import ModelTask
-from server.models.model_details import ModelDetails
-from server.models.model_provider import ModelProvider
-from server.utils.logging import llmmllogger
+from models.model import Model
+from models.model_task import ModelTask
+from models.model_details import ModelDetails
+from models.model_provider import ModelProvider
+from utils.logging import llmmllogger
 
 
 logger = llmmllogger.bind(component="common_models_router")

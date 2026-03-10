@@ -6,6 +6,8 @@ from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
+# No relative imports to convert - file only imports from pydantic
+
 
 
 class ContainerFileCitationBody(BaseModel):

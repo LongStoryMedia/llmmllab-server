@@ -19,21 +19,21 @@ from langchain_core.messages import (
     AnyMessage,
 )
 
-from server.models import (
+from models import (
     Message,
     MessageRole,
     MessageContent,
     MessageContentType,
 )
-from .logging import llmmllogger
-from .tool_call_types import is_langchain_tool_call
-from .tool_call_extraction import extract_tool_calls_from_langchain_message
-from .file_handler import (
+from utils.logging import llmmllogger
+from utils.tool_call_types import is_langchain_tool_call
+from utils.tool_call_extraction import extract_tool_calls_from_langchain_message
+from utils.file_handler import (
     decode_and_save_image,
     extract_text_from_file,
     is_image_format,
 )
-from .data_uri_utils import (
+from utils.data_uri_utils import (
     extract_base64_from_data_uri,
     extract_mime_type_from_data_uri,
     create_data_uri,
@@ -84,7 +84,8 @@ def message_to_lc_message(
                     lc_tool_call = {
                         "name": tc.name,
                         "args": tc.args if tc.args else {},
-                        "id": tc.execution_id or f"call_{tc.name}_{len(parsed_tool_calls)}",
+                        "id": tc.execution_id
+                        or f"call_{tc.name}_{len(parsed_tool_calls)}",
                     }
                     parsed_tool_calls.append(lc_tool_call)
 

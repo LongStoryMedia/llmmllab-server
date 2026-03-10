@@ -21,8 +21,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from PIL import Image
 
-from server.config import IMAGE_DIR, logger
-from server.middleware.auth import get_user_id, can_access
+from config import IMAGE_DIR, logger
+from middleware.auth import get_user_id, can_access
 
 
 class ImageGenerationRequest(BaseModel):

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_embedding_request import CreateEmbeddingRequest
-from server.models.openai.create_embedding_response import CreateEmbeddingResponse
+from models.openai.create_embedding_request import CreateEmbeddingRequest
+from models.openai.create_embedding_response import CreateEmbeddingResponse
 
 
 router = APIRouter(prefix="/embeddings", tags=["Embeddings"])

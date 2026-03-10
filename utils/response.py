@@ -13,7 +13,7 @@ from models import (
     ChatResponse,
 )
 
-from .logging import llmmllogger
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(module=__name__)
 

@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.container_file_list_resource import ContainerFileListResource
-from server.models.openai.container_file_resource import ContainerFileResource
-from server.models.openai.container_list_resource import ContainerListResource
-from server.models.openai.container_resource import ContainerResource
-from server.models.openai.create_container_body import CreateContainerBody
+from models.openai.container_file_list_resource import ContainerFileListResource
+from models.openai.container_file_resource import ContainerFileResource
+from models.openai.container_list_resource import ContainerListResource
+from models.openai.container_resource import ContainerResource
+from models.openai.create_container_body import CreateContainerBody
 
 
 router = APIRouter(prefix="/containers", tags=["Containers"])

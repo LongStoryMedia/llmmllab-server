@@ -6,9 +6,9 @@ Todo router for handling user todo list management.
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Request
 
-from server.db import storage
-from server.middleware.auth import get_user_id
-from server.models.todo_item import TodoItem
+from db import storage
+from middleware.auth import get_user_id
+from models.todo_item import TodoItem
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 
@@ -25,7 +25,9 @@ async def create_todo(todo: TodoItem, request: Request):
         return await storage.get_service(storage.todo).add_todo(todo)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating todo: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error creating todo: {str(e)}"
+        ) from e
 
 
 @router.get("/", response_model=List[TodoItem])
@@ -46,7 +48,9 @@ async def get_todos(request: Request, status: Optional[str] = None):
         return todos
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving todos: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving todos: {str(e)}"
+        ) from e
 
 
 @router.get("/{todo_id}", response_model=TodoItem)
@@ -67,7 +71,9 @@ async def get_todo(request: Request, todo_id: int):
     except HTTPException:
         raise  # Re-raise HTTP exceptions as-is
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving todo: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving todo: {str(e)}"
+        ) from e
 
 
 @router.put("/{todo_id}", response_model=TodoItem)
@@ -81,7 +87,9 @@ async def update_todo(todo: TodoItem, request: Request):
         return await storage.get_service(storage.todo).update_todo(todo)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error updating todo: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error updating todo: {str(e)}"
+        ) from e
 
 
 @router.delete("/{todo_id}")
@@ -100,7 +108,9 @@ async def delete_todo(request: Request, todo_id: int):
         return {"message": "Todo item deleted successfully"}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error deleting todo: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error deleting todo: {str(e)}"
+        ) from e
 
 
 @router.get("/conversation/{conversation_id}", response_model=List[TodoItem])
@@ -117,7 +127,9 @@ async def get_todos_by_conversation(request: Request, conversation_id: int):
         return todos
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving todos: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving todos: {str(e)}"
+        ) from e
 
 
 @router.get("/status/{status}", response_model=List[TodoItem])
@@ -133,4 +145,6 @@ async def get_todos_by_status(request: Request, status: str):
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving todos: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error retrieving todos: {str(e)}"
+        ) from e

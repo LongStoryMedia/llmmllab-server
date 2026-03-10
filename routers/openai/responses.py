@@ -1,14 +1,14 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.compact_resource import CompactResource
-from server.models.openai.compact_response_method_public_body import (
+from models.openai.compact_resource import CompactResource
+from models.openai.compact_response_method_public_body import (
     CompactResponseMethodPublicBody,
 )
-from server.models.openai.create_response import CreateResponse
-from server.models.openai.response import Response
-from server.models.openai.response_item_list import ResponseItemList
-from server.models.openai.token_counts_body import TokenCountsBody
-from server.models.openai.token_counts_resource import TokenCountsResource
+from models.openai.create_response import CreateResponse
+from models.openai.response import Response
+from models.openai.response_item_list import ResponseItemList
+from models.openai.token_counts_body import TokenCountsBody
+from models.openai.token_counts_resource import TokenCountsResource
 
 
 router = APIRouter(prefix="/responses", tags=["Responses"])

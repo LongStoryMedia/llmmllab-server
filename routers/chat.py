@@ -10,20 +10,20 @@ from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from server.middleware.auth import get_request_id, get_user_id, is_admin
-from server.db import storage  # Import database storage
-from server.models import (
+from middleware.auth import get_request_id, get_user_id, is_admin
+from db import storage  # Import database storage
+from models import (
     MessageRole,
     ChatResponse,
     Message,
 )
-from server.utils.message_conversion import extract_text_from_message  # Import logging utility
-from server.utils.logging import llmmllogger
-from server.utils.message_transformation import transform_file_content_to_documents
+from utils.message_conversion import (
+    extract_text_from_message,
+)  # Import logging utility
+from utils.logging import llmmllogger
+from utils.message_transformation import transform_file_content_to_documents
+from grpc_client import get_composer_client
 
-# Import composer interface and streaming state management
-import composer
-from composer.api.interface import ServerAdapter
 
 logger = llmmllogger.bind(component="chat_router")
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -37,24 +37,35 @@ async def composer_chat_completion(
     response_format: Optional[Type[BaseModel]] = None,
 ) -> AsyncIterator[str]:
     """Handle chat completions by delegating to composer interface."""
-    # Get user config from storage layer
-    user_config = await storage.user_config.get_user_config(user_id)
-    # Get Dialog Graph Builder
-    builder = await composer.get_graph_builder(composer.WorkFlowType.DIALOG, user_id, user_config)
+    # Get user config from storage layer - user_config is available for future use
+    _ = await storage.user_config.get_user_config(user_id)
+    # Get composer client and compose workflow via gRPC
+    client = get_composer_client()
 
-    # Compose workflow for user
-    workflow = await composer.compose_workflow(
-        user_id, builder, model_name, response_format
+    # Create initial state via gRPC
+    initial_state = await client.create_initial_state(
+        user_id=user_id,
+        conversation_id=conversation_id,
+        workflow_type="dialog",
     )
 
-    # Create initial state (conversation_id is already validated)
-    initial_state = await composer.create_initial_state(
-        user_id, conversation_id, builder
+    # Compose workflow via gRPC
+    compose_result = await client.compose_workflow(
+        user_id=user_id,
+        workflow_type="dialog",
+        model_name=model_name,
+        client_tools=None,
+        tool_choice=None,
     )
+    workflow_id = compose_result["workflow_id"]
 
     logger.info(f"Starting workflow execution for request {request_id}")
 
-    async for event in composer.execute_workflow(initial_state, workflow):
+    async for event in client.execute_workflow(
+        workflow_id=workflow_id,
+        initial_state=initial_state,
+        stream_events=True,
+    ):
         print(
             extract_text_from_message(event.message) if event.message else "",
             flush=True,

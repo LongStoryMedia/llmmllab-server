@@ -7,11 +7,11 @@ from typing import List
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Request
 
-from server.db import storage
-from server.middleware.auth import get_user_id, is_admin
+from db import storage
+from middleware.auth import get_user_id, is_admin
 
-from server.models.user import User
-from server.models.conversation import Conversation
+from models.user import User
+from models.conversation import Conversation
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -54,7 +54,9 @@ async def get_users(request: Request):
 
         return transformed_users
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching users: {str(e)}"
+        ) from e
 
 
 @router.get("/{user_id}/conversations", response_model=List[Conversation])

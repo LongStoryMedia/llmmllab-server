@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llmmll-ingress-external
+  namespace: llmmll
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.llmmll.local
+        - composer.llmmll.local
+        - runner.llmmll.local
+      secretName: llmmll-tls
+  rules:
+    - host: api.llmmll.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llmmll-server
+                port:
+                  number: 8001
+    - host: composer.llmmll.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llmmll-composer
+                port:
+                  number: 50051
+    - host: runner.llmmll.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: llmmll-runner
+                port:
+                  number: 50052

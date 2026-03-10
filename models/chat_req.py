@@ -4,43 +4,85 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .complexity_level import ComplexityLevel
-from .computational_requirement import ComputationalRequirement
-from .document import Document
-from .intent_analysis import IntentAnalysis
-from .message import Message
-from .message_content import MessageContent
-from .message_content_type import MessageContentType
-from .message_role import MessageRole
-from .model_parameters import ModelParameters
-from .required_capability import RequiredCapability
-from .resource_usage import ResourceUsage
-from .response_format import ResponseFormat
-from .technical_domain import TechnicalDomain
-from .thought import Thought
-from .tool_call import ToolCall
-from .workflow_type import WorkflowType
+from models.complexity_level import ComplexityLevel
+from models.computational_requirement import ComputationalRequirement
+from models.document import Document
+from models.intent_analysis import IntentAnalysis
+from models.message import Message
+from models.message_content import MessageContent
+from models.message_content_type import MessageContentType
+from models.message_role import MessageRole
+from models.model_parameters import ModelParameters
+from models.required_capability import RequiredCapability
+from models.resource_usage import ResourceUsage
+from models.response_format import ResponseFormat
+from models.technical_domain import TechnicalDomain
+from models.thought import Thought
+from models.tool_call import ToolCall
+from models.workflow_type import WorkflowType
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
-
 
 
 class ChatReq(BaseModel):
     """ChatReq represents a request to the Ollama API"""
-    messages: Annotated[List[Message], Field(..., description="Messages to send to the model, each message is a struct with role and content")]
+
+    messages: Annotated[
+        List[Message],
+        Field(
+            ...,
+            description="Messages to send to the model, each message is a struct with role and content",
+        ),
+    ]
     """Messages to send to the model, each message is a struct with role and content"""
-    stream: Annotated[bool, Field(..., description="If true, the response will be streamed back as a series of events")]
+    stream: Annotated[
+        bool,
+        Field(
+            ...,
+            description="If true, the response will be streamed back as a series of events",
+        ),
+    ]
     """If true, the response will be streamed back as a series of events"""
-    format: Annotated[Optional[Dict[str, Any]], Field(default=None, description="The format to return a response in. Format can be json or a JSON schema")] = None
+    format: Annotated[
+        Optional[Dict[str, Any]],
+        Field(
+            default=None,
+            description="The format to return a response in. Format can be json or a JSON schema",
+        ),
+    ] = None
     """The format to return a response in. Format can be json or a JSON schema"""
-    conversation_id: Annotated[int, Field(..., description="The ID of the conversation this message belongs to")]
+    conversation_id: Annotated[
+        int,
+        Field(..., description="The ID of the conversation this message belongs to"),
+    ]
     """The ID of the conversation this message belongs to"""
-    keep_alive: Annotated[Optional[int], Field(default=None, description="Controls how long the model will stay loaded into memory")] = None
+    keep_alive: Annotated[
+        Optional[int],
+        Field(
+            default=None,
+            description="Controls how long the model will stay loaded into memory",
+        ),
+    ] = None
     """Controls how long the model will stay loaded into memory"""
-    options: Annotated[Optional[ModelParameters], Field(default=None, description="Additional model parameters listed in the documentation for the Modelfile such as temperature")] = None
+    options: Annotated[
+        Optional[ModelParameters],
+        Field(
+            default=None,
+            description="Additional model parameters listed in the documentation for the Modelfile such as temperature",
+        ),
+    ] = None
     """Additional model parameters listed in the documentation for the Modelfile such as temperature"""
-    tools: Annotated[Optional[List[Dict[str, Any]]], Field(default=None, description="Tools to use for the request, if any")] = None
+    tools: Annotated[
+        Optional[List[Dict[str, Any]]],
+        Field(default=None, description="Tools to use for the request, if any"),
+    ] = None
     """Tools to use for the request, if any"""
-    think: Annotated[Optional[bool], Field(default=None, description="If true, the model will think before responding, useful for complex queries")] = None
+    think: Annotated[
+        Optional[bool],
+        Field(
+            default=None,
+            description="If true, the model will think before responding, useful for complex queries",
+        ),
+    ] = None
     """If true, the model will think before responding, useful for complex queries"""
 
     model_config = ConfigDict(extra="ignore")

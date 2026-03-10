@@ -19,7 +19,7 @@ import asyncio
 import time
 import uuid
 
-from server.middleware.auth import verify_token
+from middleware.auth import verify_token
 
 router = APIRouter(prefix="/ws", tags=["websockets"])
 
@@ -78,7 +78,7 @@ async def get_token_from_query(token: str = Query(None)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid authentication token: {str(e)}",
-        )
+        ) from e
 
 
 @router.websocket("/chat/{conversation_id}")
@@ -186,7 +186,7 @@ async def chat_socket(
     except Exception as e:
         try:
             await websocket.close(code=1011, reason=f"Internal error: {str(e)}")
-        except:
+        except Exception:
             pass
 
 
@@ -308,7 +308,7 @@ async def image_socket(websocket: WebSocket, token: str = Query(...)):
     except Exception as e:
         try:
             await websocket.close(code=1011, reason=f"Internal error: {str(e)}")
-        except:
+        except Exception:
             pass
 
 
@@ -400,5 +400,5 @@ async def status_socket(websocket: WebSocket, token: str = Query(...)):
     except Exception as e:
         try:
             await websocket.close(code=1011, reason=f"Internal error: {str(e)}")
-        except:
+        except Exception:
             pass

@@ -7,7 +7,9 @@ import uuid
 import json
 
 
-def deserialize_from_json(value: Any, default_factory: Optional[Callable[[], Any]] = None) -> Any:
+def deserialize_from_json(
+    value: Any, default_factory: Optional[Callable[[], Any]] = None
+) -> Any:
     """
     Deserialize a value from JSON, handling various input types from the database.
 
@@ -26,7 +28,11 @@ def deserialize_from_json(value: Any, default_factory: Optional[Callable[[], Any
 
     if isinstance(value, str):
         try:
-            return json.loads(value) if value.strip() else (default_factory() if default_factory else {})
+            return (
+                json.loads(value)
+                if value.strip()
+                else (default_factory() if default_factory else {})
+            )
         except (json.JSONDecodeError, ValueError):
             return default_factory() if default_factory else {}
 

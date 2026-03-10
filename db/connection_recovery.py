@@ -5,7 +5,7 @@ Database Connection Recovery - handles stale OID errors and connection state iss
 import asyncio
 import asyncpg
 from typing import Optional, Any, Callable, Union
-from ..utils.logging import llmmllogger
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="db_connection_recovery")
 

@@ -6,7 +6,7 @@ from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
-from .cache_control import CacheControl
+from models.anthropic.cache_control import CacheControl
 
 
 class TextContentBlock(BaseModel):

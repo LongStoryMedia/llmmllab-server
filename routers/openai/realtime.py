@@ -1,22 +1,22 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.realtime_call_refer_request import RealtimeCallReferRequest
-from server.models.openai.realtime_call_reject_request import RealtimeCallRejectRequest
-from server.models.openai.realtime_create_client_secret_request import (
+from models.openai.realtime_call_refer_request import RealtimeCallReferRequest
+from models.openai.realtime_call_reject_request import RealtimeCallRejectRequest
+from models.openai.realtime_create_client_secret_request import (
     RealtimeCreateClientSecretRequest,
 )
-from server.models.openai.realtime_create_client_secret_response import (
+from models.openai.realtime_create_client_secret_response import (
     RealtimeCreateClientSecretResponse,
 )
-from server.models.openai.realtime_session_create_request import RealtimeSessionCreateRequest
-from server.models.openai.realtime_session_create_request_ga import (
+from models.openai.realtime_session_create_request import RealtimeSessionCreateRequest
+from models.openai.realtime_session_create_request_ga import (
     RealtimeSessionCreateRequestGA,
 )
-from server.models.openai.realtime_session_create_response import RealtimeSessionCreateResponse
-from server.models.openai.realtime_transcription_session_create_request import (
+from models.openai.realtime_session_create_response import RealtimeSessionCreateResponse
+from models.openai.realtime_transcription_session_create_request import (
     RealtimeTranscriptionSessionCreateRequest,
 )
-from server.models.openai.realtime_transcription_session_create_response import (
+from models.openai.realtime_transcription_session_create_response import (
     RealtimeTranscriptionSessionCreateResponse,
 )
 

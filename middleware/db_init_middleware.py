@@ -7,9 +7,9 @@ This middleware ensures the database is initialized before handling any request.
 from fastapi import Request
 import os
 
-from server.db import storage
-from server.config import DB_CONNECTION_STRING
-from server.utils.logging import llmmllogger
+from db import storage
+from config import DB_CONNECTION_STRING
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="db_init_middleware")
 

@@ -10,15 +10,8 @@ echo "Deploying server with tag: $DOCKER_TAG"
 # Create the namespace if it doesn't exist
 kubectl create namespace llmmll || true
 
-# Get secrets from other namespaces
-DB_PASSWORD=$(kubectl get secret secrets -n psql -o jsonpath='{.data.psqlpw}' | base64 --decode)
+# Get client secret from auth namespace (required for authentication)
 CLIENT_SECRET=$(kubectl get secret client-secret -n auth -o jsonpath='{.data.client-secret}' | base64 --decode)
-
-# Create secrets for DB access
-kubectl create secret generic db-credentials \
--n llmmll \
---from-literal=password="$DB_PASSWORD" \
---dry-run=client -o yaml | kubectl apply -f - --wait=true
 
 # Create secrets for auth client
 kubectl create secret generic auth-client \
@@ -55,6 +48,13 @@ echo "Updating deployment image to use tag: $DOCKER_TAG"
 # Create a temporary file with the updated image tag
 sed "s|image: 192.168.0.71:31500/server:.*|image: 192.168.0.71:31500/server:$DOCKER_TAG|g" "$(dirname "$0")/deployment.yaml" > "$(dirname "$0")/deployment.yaml.tmp"
 mv "$(dirname "$0")/deployment.yaml.tmp" "$(dirname "$0")/deployment.yaml"
+
+echo "Applying PostgreSQL resources (from k8s/postgres)..."
+kubectl apply -f "$(dirname "$0")/postgres/secret.yaml" -n llmmll --wait=true
+kubectl apply -f "$(dirname "$0")/postgres/pvc.yaml" -n llmmll --wait=true
+kubectl apply -f "$(dirname "$0")/postgres/statefulset.yaml" -n llmmll --wait=true
+kubectl apply -f "$(dirname "$0")/postgres/service.yaml" -n llmmll --wait=true
+kubectl apply -f "$(dirname "$0")/postgres/init-scripts.yaml" -n llmmll --wait=true
 
 echo "Applying deployment..."
 kubectl apply -f "$(dirname "$0")/deployment.yaml" -n llmmll --wait=true

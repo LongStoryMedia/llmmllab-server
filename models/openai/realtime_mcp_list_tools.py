@@ -4,21 +4,30 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .mcp_list_tools_tool import MCPListToolsTool
+from models.openai.mcp_list_tools_tool import MCPListToolsTool
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
+# No relative imports - file only imports from pydantic
 
 
 class RealtimeMCPListTools(BaseModel):
-    """A Realtime item listing tools available on an MCP server.
-"""
-    id: Annotated[Optional[str], Field(default=None, description="The unique ID of the list.")] = None
+    """A Realtime item listing tools available on an MCP server."""
+
+    id: Annotated[
+        Optional[str], Field(default=None, description="The unique ID of the list.")
+    ] = None
     """The unique ID of the list."""
     server_label: Annotated[str, Field(..., description="The label of the MCP server.")]
     """The label of the MCP server."""
-    tools: Annotated[List[MCPListToolsTool], Field(..., description="The tools available on the server.")]
+    tools: Annotated[
+        List[MCPListToolsTool],
+        Field(..., description="The tools available on the server."),
+    ]
     """The tools available on the server."""
-    type: Annotated[Literal["mcp_list_tools"], Field(..., description="The type of the item. Always `mcp_list_tools`.")]
+    type: Annotated[
+        Literal["mcp_list_tools"],
+        Field(..., description="The type of the item. Always `mcp_list_tools`."),
+    ]
     """The type of the item. Always `mcp_list_tools`."""
 
     model_config = ConfigDict(extra="ignore")

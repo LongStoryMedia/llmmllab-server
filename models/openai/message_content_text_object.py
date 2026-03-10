@@ -4,11 +4,14 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .message_content_text_annotations_file_citation_object import MessageContentTextAnnotationsFileCitationObject
-from .message_content_text_annotations_file_path_object import MessageContentTextAnnotationsFilePathObject
-from .text_annotation import TextAnnotation
+from models.openai.message_content_text_annotations_file_citation_object import (
+    MessageContentTextAnnotationsFileCitationObject,
+)
+from models.openai.message_content_text_annotations_file_path_object import (
+    MessageContentTextAnnotationsFilePathObject,
+)
+from models.openai.text_annotation import TextAnnotation
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
-
 
 
 class Text(BaseModel):
@@ -18,12 +21,15 @@ class Text(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
+
 class MessageContentTextObject(BaseModel):
     """The text content that is part of a message."""
+
     text: Annotated[Text, Field(...)]
     type: Annotated[Literal["text"], Field(..., description="Always `text`.")]
     """Always `text`."""
 
     model_config = ConfigDict(extra="ignore")
+
 
 MessageContentTextObject.model_rebuild()

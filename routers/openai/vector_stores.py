@@ -1,28 +1,28 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_vector_store_file_batch_request import (
+from models.openai.create_vector_store_file_batch_request import (
     CreateVectorStoreFileBatchRequest,
 )
-from server.models.openai.create_vector_store_file_request import CreateVectorStoreFileRequest
-from server.models.openai.create_vector_store_request import CreateVectorStoreRequest
-from server.models.openai.delete_vector_store_file_response import (
+from models.openai.create_vector_store_file_request import CreateVectorStoreFileRequest
+from models.openai.create_vector_store_request import CreateVectorStoreRequest
+from models.openai.delete_vector_store_file_response import (
     DeleteVectorStoreFileResponse,
 )
-from server.models.openai.delete_vector_store_response import DeleteVectorStoreResponse
-from server.models.openai.list_vector_store_files_response import ListVectorStoreFilesResponse
-from server.models.openai.list_vector_stores_response import ListVectorStoresResponse
-from server.models.openai.update_vector_store_file_attributes_request import (
+from models.openai.delete_vector_store_response import DeleteVectorStoreResponse
+from models.openai.list_vector_store_files_response import ListVectorStoreFilesResponse
+from models.openai.list_vector_stores_response import ListVectorStoresResponse
+from models.openai.update_vector_store_file_attributes_request import (
     UpdateVectorStoreFileAttributesRequest,
 )
-from server.models.openai.update_vector_store_request import UpdateVectorStoreRequest
-from server.models.openai.vector_store_file_batch_object import VectorStoreFileBatchObject
-from server.models.openai.vector_store_file_content_response import (
+from models.openai.update_vector_store_request import UpdateVectorStoreRequest
+from models.openai.vector_store_file_batch_object import VectorStoreFileBatchObject
+from models.openai.vector_store_file_content_response import (
     VectorStoreFileContentResponse,
 )
-from server.models.openai.vector_store_file_object import VectorStoreFileObject
-from server.models.openai.vector_store_object import VectorStoreObject
-from server.models.openai.vector_store_search_request import VectorStoreSearchRequest
-from server.models.openai.vector_store_search_results_page import VectorStoreSearchResultsPage
+from models.openai.vector_store_file_object import VectorStoreFileObject
+from models.openai.vector_store_object import VectorStoreObject
+from models.openai.vector_store_search_request import VectorStoreSearchRequest
+from models.openai.vector_store_search_results_page import VectorStoreSearchResultsPage
 
 
 router = APIRouter(prefix="/vector_stores", tags=["Vector_stores"])

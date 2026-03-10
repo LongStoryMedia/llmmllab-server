@@ -24,14 +24,14 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16\x63ommon/timestamp.proto\x12\x0fgoogle.protobuf\"+\n\tTimestamp\x12\x0f\n\x07seconds\x18\x01 \x01(\x03\x12\r\n\x05nanos\x18\x02 \x01(\x05\x42\x85\x01\n\x13\x63om.google.protobufB\x0eTimestampProtoP\x01Z2google.golang.org/protobuf/types/known/timestamppb\xf8\x01\x01\xa2\x02\x03GPB\xaa\x02\x1eGoogle.Protobuf.WellKnownTypesb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16\x63ommon/timestamp.proto\x12\x06\x63ommon\"+\n\tTimestamp\x12\x0f\n\x07seconds\x18\x01 \x01(\x03\x12\r\n\x05nanos\x18\x02 \x01(\x05\x42k\n\x13\x63om.llmmllab.commonB\x0eTimestampProtoP\x01Z\'github.com/llmmllab/proto/common;common\xf8\x01\x01\xa2\x02\x03\x43MT\xaa\x02\x0fLLMMLLab.Commonb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'common.timestamp_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
-  _globals['DESCRIPTOR']._serialized_options = b'\n\023com.google.protobufB\016TimestampProtoP\001Z2google.golang.org/protobuf/types/known/timestamppb\370\001\001\242\002\003GPB\252\002\036Google.Protobuf.WellKnownTypes'
-  _globals['_TIMESTAMP']._serialized_start=43
-  _globals['_TIMESTAMP']._serialized_end=86
+  _globals['DESCRIPTOR']._serialized_options = b'\n\023com.llmmllab.commonB\016TimestampProtoP\001Z\'github.com/llmmllab/proto/common;common\370\001\001\242\002\003CMT\252\002\017LLMMLLab.Common'
+  _globals['_TIMESTAMP']._serialized_start=34
+  _globals['_TIMESTAMP']._serialized_end=77
 # @@protoc_insertion_point(module_scope)

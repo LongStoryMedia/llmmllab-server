@@ -4,185 +4,231 @@
 from __future__ import annotations
 from typing import List, Dict, Optional, Any, Union, Annotated, Literal
 from datetime import datetime, date, time, timedelta
-from .annotation import Annotation
-from .apply_patch_call_output_status import ApplyPatchCallOutputStatus
-from .apply_patch_call_output_status_param import ApplyPatchCallOutputStatusParam
-from .apply_patch_call_status import ApplyPatchCallStatus
-from .apply_patch_call_status_param import ApplyPatchCallStatusParam
-from .apply_patch_create_file_operation import ApplyPatchCreateFileOperation
-from .apply_patch_create_file_operation_param import ApplyPatchCreateFileOperationParam
-from .apply_patch_delete_file_operation import ApplyPatchDeleteFileOperation
-from .apply_patch_delete_file_operation_param import ApplyPatchDeleteFileOperationParam
-from .apply_patch_operation_param import ApplyPatchOperationParam
-from .apply_patch_tool_call import ApplyPatchToolCall
-from .apply_patch_tool_call_item_param import ApplyPatchToolCallItemParam
-from .apply_patch_tool_call_output import ApplyPatchToolCallOutput
-from .apply_patch_tool_call_output_item_param import ApplyPatchToolCallOutputItemParam
-from .apply_patch_tool_param import ApplyPatchToolParam
-from .apply_patch_update_file_operation import ApplyPatchUpdateFileOperation
-from .apply_patch_update_file_operation_param import ApplyPatchUpdateFileOperationParam
-from .approximate_location import ApproximateLocation
-from .chat_model import ChatModel
-from .click_button_type import ClickButtonType
-from .click_param import ClickParam
-from .code_interpreter_container_auto import CodeInterpreterContainerAuto
-from .code_interpreter_output_image import CodeInterpreterOutputImage
-from .code_interpreter_output_logs import CodeInterpreterOutputLogs
-from .code_interpreter_tool import CodeInterpreterTool
-from .code_interpreter_tool_call import CodeInterpreterToolCall
-from .compaction_body import CompactionBody
-from .compaction_summary_item_param import CompactionSummaryItemParam
-from .comparison_filter import ComparisonFilter
-from .comparison_filter_value_items import ComparisonFilterValueItems
-from .compound_filter import CompoundFilter
-from .computer_action import ComputerAction
-from .computer_call_output_item_param import ComputerCallOutputItemParam
-from .computer_call_safety_check_param import ComputerCallSafetyCheckParam
-from .computer_environment import ComputerEnvironment
-from .computer_screenshot_image import ComputerScreenshotImage
-from .computer_tool_call import ComputerToolCall
-from .computer_use_preview_tool import ComputerUsePreviewTool
-from .container_file_citation_body import ContainerFileCitationBody
-from .container_memory_limit import ContainerMemoryLimit
-from .conversation_2 import Conversation2
-from .custom_grammar_format_param import CustomGrammarFormatParam
-from .custom_text_format_param import CustomTextFormatParam
-from .custom_tool_call import CustomToolCall
-from .custom_tool_call_output import CustomToolCallOutput
-from .custom_tool_param import CustomToolParam
-from .detail_enum import DetailEnum
-from .double_click_action import DoubleClickAction
-from .drag import Drag
-from .drag_point import DragPoint
-from .easy_input_message import EasyInputMessage
-from .file_citation_body import FileCitationBody
-from .file_path import FilePath
-from .file_search_tool import FileSearchTool
-from .file_search_tool_call import FileSearchToolCall
-from .filters import Filters
-from .function_and_custom_tool_call_output import FunctionAndCustomToolCallOutput
-from .function_call_item_status import FunctionCallItemStatus
-from .function_call_output_item_param import FunctionCallOutputItemParam
-from .function_shell_action import FunctionShellAction
-from .function_shell_action_param import FunctionShellActionParam
-from .function_shell_call import FunctionShellCall
-from .function_shell_call_item_param import FunctionShellCallItemParam
-from .function_shell_call_item_status import FunctionShellCallItemStatus
-from .function_shell_call_output import FunctionShellCallOutput
-from .function_shell_call_output_content import FunctionShellCallOutputContent
-from .function_shell_call_output_content_param import FunctionShellCallOutputContentParam
-from .function_shell_call_output_exit_outcome import FunctionShellCallOutputExitOutcome
-from .function_shell_call_output_exit_outcome_param import FunctionShellCallOutputExitOutcomeParam
-from .function_shell_call_output_item_param import FunctionShellCallOutputItemParam
-from .function_shell_call_output_outcome_param import FunctionShellCallOutputOutcomeParam
-from .function_shell_call_output_timeout_outcome import FunctionShellCallOutputTimeoutOutcome
-from .function_shell_call_output_timeout_outcome_param import FunctionShellCallOutputTimeoutOutcomeParam
-from .function_shell_tool_param import FunctionShellToolParam
-from .function_tool import FunctionTool
-from .function_tool_call import FunctionToolCall
-from .grammar_syntax1 import GrammarSyntax1
-from .hybrid_search_options import HybridSearchOptions
-from .image_detail import ImageDetail
-from .image_gen_tool import ImageGenTool
-from .image_gen_tool_call import ImageGenToolCall
-from .input_content import InputContent
-from .input_fidelity import InputFidelity
-from .input_file_content import InputFileContent
-from .input_file_content_param import InputFileContentParam
-from .input_image_content import InputImageContent
-from .input_image_content_param_auto_param import InputImageContentParamAutoParam
-from .input_item import InputItem
-from .input_message import InputMessage
-from .input_message_content_list import InputMessageContentList
-from .input_text_content import InputTextContent
-from .input_text_content_param import InputTextContentParam
-from .item import Item
-from .item_reference_param import ItemReferenceParam
-from .key_press_action import KeyPressAction
-from .local_shell_call_status import LocalShellCallStatus
-from .local_shell_exec_action import LocalShellExecAction
-from .local_shell_tool_call import LocalShellToolCall
-from .local_shell_tool_call_output import LocalShellToolCallOutput
-from .local_shell_tool_param import LocalShellToolParam
-from .log_prob import LogProb
-from .mcp_approval_request import MCPApprovalRequest
-from .mcp_approval_response import MCPApprovalResponse
-from .mcp_list_tools import MCPListTools
-from .mcp_list_tools_tool import MCPListToolsTool
-from .mcp_tool import MCPTool
-from .mcp_tool_call import MCPToolCall
-from .mcp_tool_call_status import MCPToolCallStatus
-from .mcp_tool_filter import MCPToolFilter
-from .metadata import Metadata
-from .model_ids_responses import ModelIdsResponses
-from .model_ids_shared import ModelIdsShared
-from .model_response_properties import ModelResponseProperties
-from .move import Move
-from .output_item import OutputItem
-from .output_message import OutputMessage
-from .output_message_content import OutputMessageContent
-from .output_text_content import OutputTextContent
-from .prompt import Prompt
-from .ranker_version_type import RankerVersionType
-from .ranking_options import RankingOptions
-from .reasoning import Reasoning
-from .reasoning_effort import ReasoningEffort
-from .reasoning_item import ReasoningItem
-from .reasoning_text_content import ReasoningTextContent
-from .refusal_content import RefusalContent
-from .response import Response
-from .response_error import ResponseError
-from .response_error_code import ResponseErrorCode
-from .response_format_json_object import ResponseFormatJsonObject
-from .response_format_json_schema_schema import ResponseFormatJsonSchemaSchema
-from .response_format_text import ResponseFormatText
-from .response_prompt_variables import ResponsePromptVariables
-from .response_properties import ResponseProperties
-from .response_text_param import ResponseTextParam
-from .response_usage import ResponseUsage
-from .screenshot import Screenshot
-from .scroll import Scroll
-from .search_context_size import SearchContextSize
-from .service_tier import ServiceTier
-from .specific_apply_patch_param import SpecificApplyPatchParam
-from .specific_function_shell_param import SpecificFunctionShellParam
-from .summary import Summary
-from .text_response_format_configuration import TextResponseFormatConfiguration
-from .text_response_format_json_schema import TextResponseFormatJsonSchema
-from .tool import Tool
-from .tool_choice_allowed import ToolChoiceAllowed
-from .tool_choice_custom import ToolChoiceCustom
-from .tool_choice_function import ToolChoiceFunction
-from .tool_choice_mcp import ToolChoiceMCP
-from .tool_choice_options import ToolChoiceOptions
-from .tool_choice_param import ToolChoiceParam
-from .tool_choice_types import ToolChoiceTypes
-from .tools_array import ToolsArray
-from .top_log_prob import TopLogProb
-from .type import Type
-from .url_citation_body import UrlCitationBody
-from .vector_store_file_attributes import VectorStoreFileAttributes
-from .verbosity import Verbosity
-from .wait import Wait
-from .web_search_action_find import WebSearchActionFind
-from .web_search_action_open_page import WebSearchActionOpenPage
-from .web_search_action_search import WebSearchActionSearch
-from .web_search_approximate_location import WebSearchApproximateLocation
-from .web_search_preview_tool import WebSearchPreviewTool
-from .web_search_tool import WebSearchTool
-from .web_search_tool_call import WebSearchToolCall
+from models.openai.annotation import Annotation
+from models.openai.apply_patch_call_output_status import ApplyPatchCallOutputStatus
+from models.openai.apply_patch_call_output_status_param import (
+    ApplyPatchCallOutputStatusParam,
+)
+from models.openai.apply_patch_call_status import ApplyPatchCallStatus
+from models.openai.apply_patch_call_status_param import ApplyPatchCallStatusParam
+from models.openai.apply_patch_create_file_operation import (
+    ApplyPatchCreateFileOperation,
+)
+from models.openai.apply_patch_create_file_operation_param import (
+    ApplyPatchCreateFileOperationParam,
+)
+from models.openai.apply_patch_delete_file_operation import (
+    ApplyPatchDeleteFileOperation,
+)
+from models.openai.apply_patch_delete_file_operation_param import (
+    ApplyPatchDeleteFileOperationParam,
+)
+from models.openai.apply_patch_operation_param import ApplyPatchOperationParam
+from models.openai.apply_patch_tool_call import ApplyPatchToolCall
+from models.openai.apply_patch_tool_call_item_param import ApplyPatchToolCallItemParam
+from models.openai.apply_patch_tool_call_output import ApplyPatchToolCallOutput
+from models.openai.apply_patch_tool_call_output_item_param import (
+    ApplyPatchToolCallOutputItemParam,
+)
+from models.openai.apply_patch_tool_param import ApplyPatchToolParam
+from models.openai.apply_patch_update_file_operation import (
+    ApplyPatchUpdateFileOperation,
+)
+from models.openai.apply_patch_update_file_operation_param import (
+    ApplyPatchUpdateFileOperationParam,
+)
+from models.openai.approximate_location import ApproximateLocation
+from models.openai.chat_model import ChatModel
+from models.openai.click_button_type import ClickButtonType
+from models.openai.click_param import ClickParam
+from models.openai.code_interpreter_container_auto import CodeInterpreterContainerAuto
+from models.openai.code_interpreter_output_image import CodeInterpreterOutputImage
+from models.openai.code_interpreter_output_logs import CodeInterpreterOutputLogs
+from models.openai.code_interpreter_tool import CodeInterpreterTool
+from models.openai.code_interpreter_tool_call import CodeInterpreterToolCall
+from models.openai.compaction_body import CompactionBody
+from models.openai.compaction_summary_item_param import CompactionSummaryItemParam
+from models.openai.comparison_filter import ComparisonFilter
+from models.openai.comparison_filter_value_items import ComparisonFilterValueItems
+from models.openai.compound_filter import CompoundFilter
+from models.openai.computer_action import ComputerAction
+from models.openai.computer_call_output_item_param import ComputerCallOutputItemParam
+from models.openai.computer_call_safety_check_param import ComputerCallSafetyCheckParam
+from models.openai.computer_environment import ComputerEnvironment
+from models.openai.computer_screenshot_image import ComputerScreenshotImage
+from models.openai.computer_tool_call import ComputerToolCall
+from models.openai.computer_use_preview_tool import ComputerUsePreviewTool
+from models.openai.container_file_citation_body import ContainerFileCitationBody
+from models.openai.container_memory_limit import ContainerMemoryLimit
+from models.openai.conversation_2 import Conversation2
+from models.openai.custom_grammar_format_param import CustomGrammarFormatParam
+from models.openai.custom_text_format_param import CustomTextFormatParam
+from models.openai.custom_tool_call import CustomToolCall
+from models.openai.custom_tool_call_output import CustomToolCallOutput
+from models.openai.custom_tool_param import CustomToolParam
+from models.openai.detail_enum import DetailEnum
+from models.openai.double_click_action import DoubleClickAction
+from models.openai.drag import Drag
+from models.openai.drag_point import DragPoint
+from models.openai.easy_input_message import EasyInputMessage
+from models.openai.file_citation_body import FileCitationBody
+from models.openai.file_path import FilePath
+from models.openai.file_search_tool import FileSearchTool
+from models.openai.file_search_tool_call import FileSearchToolCall
+from models.openai.filters import Filters
+from models.openai.function_and_custom_tool_call_output import (
+    FunctionAndCustomToolCallOutput,
+)
+from models.openai.function_call_item_status import FunctionCallItemStatus
+from models.openai.function_call_output_item_param import FunctionCallOutputItemParam
+from models.openai.function_shell_action import FunctionShellAction
+from models.openai.function_shell_action_param import FunctionShellActionParam
+from models.openai.function_shell_call import FunctionShellCall
+from models.openai.function_shell_call_item_param import FunctionShellCallItemParam
+from models.openai.function_shell_call_item_status import FunctionShellCallItemStatus
+from models.openai.function_shell_call_output import FunctionShellCallOutput
+from models.openai.function_shell_call_output_content import (
+    FunctionShellCallOutputContent,
+)
+from models.openai.function_shell_call_output_content_param import (
+    FunctionShellCallOutputContentParam,
+)
+from models.openai.function_shell_call_output_exit_outcome import (
+    FunctionShellCallOutputExitOutcome,
+)
+from models.openai.function_shell_call_output_exit_outcome_param import (
+    FunctionShellCallOutputExitOutcomeParam,
+)
+from models.openai.function_shell_call_output_item_param import (
+    FunctionShellCallOutputItemParam,
+)
+from models.openai.function_shell_call_output_outcome_param import (
+    FunctionShellCallOutputOutcomeParam,
+)
+from models.openai.function_shell_call_output_timeout_outcome import (
+    FunctionShellCallOutputTimeoutOutcome,
+)
+from models.openai.function_shell_call_output_timeout_outcome_param import (
+    FunctionShellCallOutputTimeoutOutcomeParam,
+)
+from models.openai.function_shell_tool_param import FunctionShellToolParam
+from models.openai.function_tool import FunctionTool
+from models.openai.function_tool_call import FunctionToolCall
+from models.openai.grammar_syntax1 import GrammarSyntax1
+from models.openai.hybrid_search_options import HybridSearchOptions
+from models.openai.image_detail import ImageDetail
+from models.openai.image_gen_tool import ImageGenTool
+from models.openai.image_gen_tool_call import ImageGenToolCall
+from models.openai.input_content import InputContent
+from models.openai.input_fidelity import InputFidelity
+from models.openai.input_file_content import InputFileContent
+from models.openai.input_file_content_param import InputFileContentParam
+from models.openai.input_image_content import InputImageContent
+from models.openai.input_image_content_param_auto_param import (
+    InputImageContentParamAutoParam,
+)
+from models.openai.input_item import InputItem
+from models.openai.input_message import InputMessage
+from models.openai.input_message_content_list import InputMessageContentList
+from models.openai.input_text_content import InputTextContent
+from models.openai.input_text_content_param import InputTextContentParam
+from models.openai.item import Item
+from models.openai.item_reference_param import ItemReferenceParam
+from models.openai.key_press_action import KeyPressAction
+from models.openai.local_shell_call_status import LocalShellCallStatus
+from models.openai.local_shell_exec_action import LocalShellExecAction
+from models.openai.local_shell_tool_call import LocalShellToolCall
+from models.openai.local_shell_tool_call_output import LocalShellToolCallOutput
+from models.openai.local_shell_tool_param import LocalShellToolParam
+from models.openai.log_prob import LogProb
+from models.openai.mcp_approval_request import MCPApprovalRequest
+from models.openai.mcp_approval_response import MCPApprovalResponse
+from models.openai.mcp_list_tools import MCPListTools
+from models.openai.mcp_list_tools_tool import MCPListToolsTool
+from models.openai.mcp_tool import MCPTool
+from models.openai.mcp_tool_call import MCPToolCall
+from models.openai.mcp_tool_call_status import MCPToolCallStatus
+from models.openai.mcp_tool_filter import MCPToolFilter
+from models.openai.metadata import Metadata
+from models.openai.model_ids_responses import ModelIdsResponses
+from models.openai.model_ids_shared import ModelIdsShared
+from models.openai.model_response_properties import ModelResponseProperties
+from models.openai.move import Move
+from models.openai.output_item import OutputItem
+from models.openai.output_message import OutputMessage
+from models.openai.output_message_content import OutputMessageContent
+from models.openai.output_text_content import OutputTextContent
+from models.openai.prompt import Prompt
+from models.openai.ranker_version_type import RankerVersionType
+from models.openai.ranking_options import RankingOptions
+from models.openai.reasoning import Reasoning
+from models.openai.reasoning_effort import ReasoningEffort
+from models.openai.reasoning_item import ReasoningItem
+from models.openai.reasoning_text_content import ReasoningTextContent
+from models.openai.refusal_content import RefusalContent
+from models.openai.response import Response
+from models.openai.response_error import ResponseError
+from models.openai.response_error_code import ResponseErrorCode
+from models.openai.response_format_json_object import ResponseFormatJsonObject
+from models.openai.response_format_json_schema_schema import (
+    ResponseFormatJsonSchemaSchema,
+)
+from models.openai.response_format_text import ResponseFormatText
+from models.openai.response_prompt_variables import ResponsePromptVariables
+from models.openai.response_properties import ResponseProperties
+from models.openai.response_text_param import ResponseTextParam
+from models.openai.response_usage import ResponseUsage
+from models.openai.screenshot import Screenshot
+from models.openai.scroll import Scroll
+from models.openai.search_context_size import SearchContextSize
+from models.openai.service_tier import ServiceTier
+from models.openai.specific_apply_patch_param import SpecificApplyPatchParam
+from models.openai.specific_function_shell_param import SpecificFunctionShellParam
+from models.openai.summary import Summary
+from models.openai.text_response_format_configuration import (
+    TextResponseFormatConfiguration,
+)
+from models.openai.text_response_format_json_schema import TextResponseFormatJsonSchema
+from models.openai.tool import Tool
+from models.openai.tool_choice_allowed import ToolChoiceAllowed
+from models.openai.tool_choice_custom import ToolChoiceCustom
+from models.openai.tool_choice_function import ToolChoiceFunction
+from models.openai.tool_choice_mcp import ToolChoiceMCP
+from models.openai.tool_choice_options import ToolChoiceOptions
+from models.openai.tool_choice_param import ToolChoiceParam
+from models.openai.tool_choice_types import ToolChoiceTypes
+from models.openai.tools_array import ToolsArray
+from models.openai.top_log_prob import TopLogProb
+from models.openai.type import Type
+from models.openai.url_citation_body import UrlCitationBody
+from models.openai.vector_store_file_attributes import VectorStoreFileAttributes
+from models.openai.verbosity import Verbosity
+from models.openai.wait import Wait
+from models.openai.web_search_action_find import WebSearchActionFind
+from models.openai.web_search_action_open_page import WebSearchActionOpenPage
+from models.openai.web_search_action_search import WebSearchActionSearch
+from models.openai.web_search_approximate_location import WebSearchApproximateLocation
+from models.openai.web_search_preview_tool import WebSearchPreviewTool
+from models.openai.web_search_tool import WebSearchTool
+from models.openai.web_search_tool_call import WebSearchToolCall
 from pydantic import BaseModel, ConfigDict, Field, AnyUrl, EmailStr, conint, confloat
 
 
-
 class ResponseIncompleteEvent(BaseModel):
-    """An event that is emitted when a response finishes as incomplete.
-"""
-    response: Annotated[Response, Field(..., description="The response that was incomplete. ")]
+    """An event that is emitted when a response finishes as incomplete."""
+
+    response: Annotated[
+        Response, Field(..., description="The response that was incomplete. ")
+    ]
     """The response that was incomplete. """
-    sequence_number: Annotated[int, Field(..., description="The sequence number of this event.")]
+    sequence_number: Annotated[
+        int, Field(..., description="The sequence number of this event.")
+    ]
     """The sequence number of this event."""
-    type: Annotated[Literal["response.incomplete"], Field(..., description="The type of the event. Always `response.incomplete`. ")]
+    type: Annotated[
+        Literal["response.incomplete"],
+        Field(..., description="The type of the event. Always `response.incomplete`. "),
+    ]
     """The type of the event. Always `response.incomplete`. """
 
     model_config = ConfigDict(extra="ignore")

@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+echo "Starting PostgreSQL initialization..."
+
+# Wait for PostgreSQL to be ready
+until pg_isready -U "lsm" -d "llmmll" -h 127.0.0.1 -p 5432 2>/dev/null; do
+  echo "Waiting for PostgreSQL to be ready..."
+  sleep 2
+done
+
+echo "PostgreSQL is ready. Creating extensions and databases..."
+
+# Create pgvector extension
+psql -v ON_ERROR_STOP=0 --username "lsm" --dbname "llmmll" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+# Create timescaledb extension
+psql -v ON_ERROR_STOP=0 --username "lsm" --dbname "llmmll" -c "CREATE EXTENSION IF NOT EXISTS timescaledb;"
+
+# List all databases
+echo "Current databases:"
+psql -U "lsm" --dbname "llmmll" -c "\l"
+
+echo "PostgreSQL initialization completed successfully!"

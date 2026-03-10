@@ -1,29 +1,29 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_fine_tuning_checkpoint_permission_request import (
+from models.openai.create_fine_tuning_checkpoint_permission_request import (
     CreateFineTuningCheckpointPermissionRequest,
 )
-from server.models.openai.create_fine_tuning_job_request import CreateFineTuningJobRequest
-from server.models.openai.delete_fine_tuning_checkpoint_permission_response import (
+from models.openai.create_fine_tuning_job_request import CreateFineTuningJobRequest
+from models.openai.delete_fine_tuning_checkpoint_permission_response import (
     DeleteFineTuningCheckpointPermissionResponse,
 )
-from server.models.openai.fine_tuning_job import FineTuningJob
-from server.models.openai.list_fine_tuning_checkpoint_permission_response import (
+from models.openai.fine_tuning_job import FineTuningJob
+from models.openai.list_fine_tuning_checkpoint_permission_response import (
     ListFineTuningCheckpointPermissionResponse,
 )
-from server.models.openai.list_fine_tuning_job_checkpoints_response import (
+from models.openai.list_fine_tuning_job_checkpoints_response import (
     ListFineTuningJobCheckpointsResponse,
 )
-from server.models.openai.list_fine_tuning_job_events_response import (
+from models.openai.list_fine_tuning_job_events_response import (
     ListFineTuningJobEventsResponse,
 )
-from server.models.openai.list_paginated_fine_tuning_jobs_response import (
+from models.openai.list_paginated_fine_tuning_jobs_response import (
     ListPaginatedFineTuningJobsResponse,
 )
-from server.models.openai.run_grader_request import RunGraderRequest
-from server.models.openai.run_grader_response import RunGraderResponse
-from server.models.openai.validate_grader_request import ValidateGraderRequest
-from server.models.openai.validate_grader_response import ValidateGraderResponse
+from models.openai.run_grader_request import RunGraderRequest
+from models.openai.run_grader_response import RunGraderResponse
+from models.openai.validate_grader_request import ValidateGraderRequest
+from models.openai.validate_grader_response import ValidateGraderResponse
 
 
 router = APIRouter(prefix="/fine_tuning", tags=["Fine_tuning"])

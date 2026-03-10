@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_image_request import CreateImageRequest
-from server.models.openai.images_response import ImagesResponse
+from models.openai.create_image_request import CreateImageRequest
+from models.openai.images_response import ImagesResponse
 
 
 router = APIRouter(prefix="/images", tags=["Images"])

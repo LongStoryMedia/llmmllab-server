@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_video_body import CreateVideoBody
-from server.models.openai.create_video_remix_body import CreateVideoRemixBody
-from server.models.openai.deleted_video_resource import DeletedVideoResource
-from server.models.openai.video_list_resource import VideoListResource
-from server.models.openai.video_resource import VideoResource
+from models.openai.create_video_body import CreateVideoBody
+from models.openai.create_video_remix_body import CreateVideoRemixBody
+from models.openai.deleted_video_resource import DeletedVideoResource
+from models.openai.video_list_resource import VideoListResource
+from models.openai.video_resource import VideoResource
 
 
 router = APIRouter(prefix="/videos", tags=["Videos"])

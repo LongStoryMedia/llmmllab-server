@@ -5,10 +5,10 @@ Message contents represent the actual content parts of messages (text, URLs, etc
 
 import asyncpg
 from typing import List, Optional
-from ..models.message_content import MessageContent
-from ..models.message_content_type import MessageContentType
-from .db_utils import TypedConnection, typed_pool
-from ..utils.logging import llmmllogger
+from models.message_content import MessageContent
+from models.message_content_type import MessageContentType
+from db.db_utils import TypedConnection, typed_pool
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="message_content_storage")
 
@@ -143,7 +143,11 @@ class MessageContentStorage:
                 )
 
                 # Check if any rows were affected (asyncpg returns "DELETE N" where N > 0)
-                if result and result.startswith("DELETE ") and int(result.split()[-1]) > 0:
+                if (
+                    result
+                    and result.startswith("DELETE ")
+                    and int(result.split()[-1]) > 0
+                ):
                     self.logger.info(f"Deleted message content {content_id}")
                     return True
                 else:
@@ -172,7 +176,11 @@ class MessageContentStorage:
 
                 self.logger.info(f"Deleted contents for message {message_id}: {result}")
                 # Check if any rows were affected
-                if result and result.startswith("DELETE ") and int(result.split()[-1]) > 0:
+                if (
+                    result
+                    and result.startswith("DELETE ")
+                    and int(result.split()[-1]) > 0
+                ):
                     return True
                 else:
                     self.logger.warning(f"No contents found for message {message_id}")

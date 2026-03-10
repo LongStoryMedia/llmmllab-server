@@ -1,0 +1,20 @@
+# PostgreSQL LoadBalancer Service
+# This service provides external access to PostgreSQL via LoadBalancer
+# Use this if external access is needed, otherwise use ClusterIP (postgres service)
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-lb
+  namespace: llmmll
+  labels:
+    app: postgres
+spec:
+  type: LoadBalancer
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP

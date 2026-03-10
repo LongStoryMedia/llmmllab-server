@@ -6,9 +6,9 @@ Thoughts represent AI assistant thinking/reasoning content linked to messages.
 import asyncpg
 from typing import List, Optional
 from datetime import datetime
-from ..models.thought import Thought
-from .db_utils import TypedConnection, typed_pool
-from ..utils.logging import llmmllogger
+from models.thought import Thought
+from db.db_utils import TypedConnection, typed_pool
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="thought_storage")
 

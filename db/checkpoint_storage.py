@@ -6,7 +6,7 @@ Provides clean factory methods for creating checkpointers without unnecessary ab
 from typing import Optional
 from contextlib import asynccontextmanager
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from ..utils.logging import llmmllogger
+from utils.logging import llmmllogger
 
 logger = llmmllogger.bind(component="checkpoint_storage")
 

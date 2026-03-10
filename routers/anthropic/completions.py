@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException, Request
 from typing import Union
 from fastapi.responses import StreamingResponse
 
-from server.middleware.auth import get_user_id
-from server.models.anthropic.create_completion_request import CreateCompletionRequest
-from server.models.anthropic.completion_response import CompletionResponse
-from server.utils.logging import llmmllogger
+from middleware.auth import get_user_id
+from models.anthropic.create_completion_request import CreateCompletionRequest
+from models.anthropic.completion_response import CompletionResponse
+from utils.logging import llmmllogger
 
 
 logger = llmmllogger.bind(component="anthropic_completions_router")

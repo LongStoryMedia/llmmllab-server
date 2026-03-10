@@ -3,8 +3,8 @@
 from typing import Callable, List, Optional
 import asyncpg
 
-from ..models.document import Document
-from .db_utils import typed_pool, get_recovery_manager
+from models.document import Document
+from db.db_utils import typed_pool, get_recovery_manager
 
 
 class DocumentStorage:

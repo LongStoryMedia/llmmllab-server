@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 from typing import Optional
-from server.models.openai.create_eval_request import CreateEvalRequest
-from server.models.openai.create_eval_run_request import CreateEvalRunRequest
-from server.models.openai.eval import Eval
-from server.models.openai.eval_list import EvalList
-from server.models.openai.eval_run import EvalRun
-from server.models.openai.eval_run_list import EvalRunList
-from server.models.openai.eval_run_output_item import EvalRunOutputItem
-from server.models.openai.eval_run_output_item_list import EvalRunOutputItemList
+from models.openai.create_eval_request import CreateEvalRequest
+from models.openai.create_eval_run_request import CreateEvalRunRequest
+from models.openai.eval import Eval
+from models.openai.eval_list import EvalList
+from models.openai.eval_run import EvalRun
+from models.openai.eval_run_list import EvalRunList
+from models.openai.eval_run_output_item import EvalRunOutputItem
+from models.openai.eval_run_output_item_list import EvalRunOutputItemList
 
 
 router = APIRouter(prefix="/evals", tags=["Evals"])
