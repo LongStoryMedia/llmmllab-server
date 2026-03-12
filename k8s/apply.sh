@@ -3,6 +3,9 @@
 set -e
 
 DOCKER_TAG=${DOCKER_TAG:-main}
+if [[ $DOCKER_TAG == "main" ]]; then
+    DOCKER_TAG="latest"
+fi
 # Replace slashes with dots in the tag name for Docker compatibility
 DOCKER_TAG=$(echo "$DOCKER_TAG" | tr '/' '.')
 echo "Deploying server with tag: $DOCKER_TAG"

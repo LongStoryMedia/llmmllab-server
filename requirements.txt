@@ -22,3 +22,17 @@ grpcio==1.78.0  # For gRPC communication
 grpcio-tools==1.78.0  # For gRPC code generation
 protobuf==6.33.5
 googleapis-common-protos==1.73.0  # For proto imports (google/api/annotations.proto)
+Pillow==11.0.0  # For image processing
+
+# LangChain/LangGraph for workflow support
+langchain==1.0.2
+langchain-core==1.0.2
+langgraph==1.0.2
+langgraph-checkpoint-postgres==2.0.0
+langchain-openai==1.0.1
+langchain-anthropic==1.0.0
+langchain-classic==1.0.0
+langchain-community==0.3.31
+
+# libpq-dev for psycopg to work
+psycopg[binary]==3.2.3

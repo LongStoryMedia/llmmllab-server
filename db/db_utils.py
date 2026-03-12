@@ -103,8 +103,9 @@ def get_recovery_manager(pool: asyncpg.Pool) -> ConnectionRecoveryManager:
         ConnectionRecoveryManager instance associated with the pool
     """
     # Store recovery manager in pool's __dict__ for retrieval
-    if not hasattr(pool, "_recovery_manager"):
-        pool._recovery_manager = ConnectionRecoveryManager(
+    # Note: asyncpg.Pool uses __slots__, so we use __dict__ to add the attribute
+    if "_recovery_manager" not in pool.__dict__:
+        pool.__dict__["_recovery_manager"] = ConnectionRecoveryManager(
             pool
-        )  # pyright: ignore[reportAttributeAccessIssue]
-    return pool._recovery_manager  # pyright: ignore[reportAttributeAccessIssue]
+        )
+    return pool.__dict__["_recovery_manager"]
